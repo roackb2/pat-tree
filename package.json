@@ -16,10 +16,7 @@
     "tree"
   ],
   "author": "Jay Liang <roackb2@gmail.com> (https://www.facebook.com/profile.php?id=1391931108)",
-  "license": {
-      "type": "MIT",
-      "url": "https://github.com/roackb2/pat-tree/master/LICENSE"
-    },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/roackb2/pat-tree/issues"
   },
