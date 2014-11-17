@@ -25,9 +25,9 @@ PATtree.prototype = {
 			var charSistring = sentense.slice(i, sentense.length);
 			var sistring = this._toBinary(charSistring);
 			this._addSistring(sistring);
-			console.log("\tafter adding sistring " + charSistring + ":\n");
+			//console.log("\tafter adding sistring " + charSistring + ":\n");
 			//console.log("check connection: " + this._checkConnections());
-			this._printTreeContent();			
+			//this._printTreeContent();			
 		}
 	},
 
@@ -50,7 +50,8 @@ PATtree.prototype = {
 		if(tree.isRoot(nodeId) && tree.root.data == null) {
 			tree.setNodeData(nodeId, {
 				type: this.EXTERNAL,
-				sistring: sistring
+				sistring: sistring,
+				count: 1
 			});
 		} else if(node.data.type == this.INTERNAL) {
 			var prefix = node.data.prefix;
@@ -68,7 +69,8 @@ PATtree.prototype = {
 						var leftChild = this._createNode();
 						leftChild.data = {
 							type: this.EXTERNAL,
-							sistring: sistring
+							sistring: sistring,
+							count: 1
 						};
 						tree.appendLeftChild(nodeId, leftChild);
 					} else {
@@ -79,7 +81,8 @@ PATtree.prototype = {
 						var rightChild = this._createNode();
 						rightChild.data = {
 							type: this.EXTERNAL,
-							sistring: sistring
+							sistring: sistring,
+							count: 1
 						}
 						tree.appendRightChild(nodeId, rightChild);
 					} else {
@@ -93,7 +96,7 @@ PATtree.prototype = {
 			}
 		} else if(node.data.type == this.EXTERNAL) {
 			if(node.data.sistring == sistring) {
-				//TODO: add to position list.
+				node.data.count++;
 			} else {
 				this._rebuildInternalSubtree(tree, node, sistring);
 			}
@@ -109,28 +112,37 @@ PATtree.prototype = {
 		}
 		*/
 		var nodeString;
+		var sistrings = [];
+
 		if(node.data.type == this.INTERNAL) {
 			nodeString = node.data.prefix;
+			sistrings = sistrings.concat(node.data.sistrings);
 		} else if(node.data.type == this.EXTERNAL) {
 			nodeString = node.data.sistring;
+			sistrings.push(node);
 		}
 		var branchBit = this._findBranchPosition(nodeString, sistring);
 		var parent = node.parent;
 		var subtree = this._createSubTree();
 
+		var externalNode = this._createNode();
+		externalNode.data = {
+			type: this.EXTERNAL,
+			sistring: sistring,
+			count: 1
+		};
+
+		sistrings.push(externalNode);
 
 		var subtreeRoot = subtree.getRoot();
 		subtreeRoot.data = {
 			type: this.INTERNAL,
 			position: branchBit,
-			prefix: sistring.slice(0, branchBit)
+			prefix: sistring.slice(0, branchBit),
+			sistrings: sistrings
 		};
 
-		var externalNode = this._createNode();
-		externalNode.data = {
-			type: this.EXTERNAL,
-			sistring: sistring
-		};
+
 
 		var type = tree.getNodeType(node.id);
 
@@ -217,7 +229,17 @@ PATtree.prototype = {
 		return output;
 	},
 
-
+	_toString: function(b) {
+		var output = "";
+		var temp = 0;
+		var charCount = b.length / 15;
+		for(var i = 0; i < charCount; i++) {
+			var binary = b.slice(i * 15, (i + 1) * 15);
+			var number = parseInt(binary, 2);
+			output += String.fromCharCode(number);
+		}
+		return output;
+	},
 
 	_splitDocument: function(doc) {
 		var regex = /[，。,.\s]+/;
@@ -227,6 +249,7 @@ PATtree.prototype = {
 
 	_printTreeContent: function() {
 		var tree = this.tree;
+		var owner = this;
 		tree.preOrderTraverse(function(node) {
 			console.log("id: " + node.id);
 			var type = tree.getNodeType(node.id);
@@ -234,8 +257,18 @@ PATtree.prototype = {
 			if(type != "root") {
 				console.log("parent: " + node.parent.id);
 			}
-			for(var key in node.data) {
-				console.log(key + ": " + node.data[key]);
+			console.log("type: " + node.data.type);
+			if(node.data.type == owner.INTERNAL) {
+				console.log("position: " + node.data.position);
+				console.log("prefix: " + node.data.prefix);
+				console.log("sistrings: ");
+				for(var i = 0; i < node.data.sistrings.length; i++) {
+					console.log(" sistring: " + node.data.sistrings[i].data.sistring);
+					console.log(" count: " + node.data.sistrings[i].data.count);
+				}				
+			} else if(node.data.type == owner.EXTERNAL) {
+				console.log("sistring: " + node.data.sistring);
+				console.log("count: " + node.data.count);
 			}
 			console.log();
 		});		
@@ -270,19 +303,59 @@ PATtree.prototype = {
 		return tree;
 	},
 
+
 	_test: function() {
 		var tree = this.tree;
-		var input = "夜宿北師美術館與蔡明亮深夜長談，知道心中有幾扇門被打開了，感動不已。 \
+		var input1 = "夜宿北師美術館與蔡明亮深夜長談，知道心中有幾扇門被打開了，感動不已。 \
 他是一個那麼藝術的人，全身上下散發著這樣的氣味，相信並不是每件事情都必須是個 business、for some reason。就像月亮掛在那邊並不具有特定意義，千古文人卻又將自身情感繫於其中投射出千古詩篇。看「郊遊」才知道原來電影還能這樣拍。它慢的令人焦躁，卻又令人清晰著每個畫面。他可惜著電影這麼棒的媒材，到現在卻只淪落為商品為娛樂，用作品告訴人其實電影能像本書一樣，充實自己。 \
 憑藉著郊遊拿下金馬影帝的李康生，劇中表現。郊遊男主角詮釋到位，讓你以為他真的曾經是個落魄到底的中年男子，導演透過層層篩選才找到他。然而知道他正是李康生之後，又讓我震驚不已。他是蔡導演二十年來的唯一男主角。\
 蔡導和李康生二十年的情緣，深深讓我觸動。二十年來每部電影都有李康生，這是多麼難得的執著與緣份，李康生是蔡明亮靈魂的一部分。這微妙的關係，或許就像福爾摩斯與華生吧！ \
 夜宿北美館，其實跟郊遊沒有太大的關係，而是蔡導希望在市民心中種下一棵希望的種子。喔，不是，是在小孩心中種下藝術的種子。從小讓孩子知道美術館並不是不可侵犯的殿堂，而是讓人得到心靈充足的地方。應該要學習如何接近，知道這裡親切的甚至可以睡到這裡。\
 沒想到卻也吸引到我們這群老小孩，目的卻也達到了。 \
 最後真的推薦各位快到北師美術館體驗郊遊這齣電影，與蔡明亮近距離互動，畢竟很多感受沒辦法透過言語傳達。一如 \"拉拉拉拉～\" \"哎呀吼嗨呀～\""; 
-		this.addDocument(input);
+		var input2 = "#覺得絕望 \
+\
+\
+我並不是喜歡等待\
+我並不是習慣等待\
+\
+因為我愛妳\
+我去習慣了所有不喜歡\
+因為我愛妳\
+我努力的為了將來在拼\
+因為我愛妳\
+我真的很不想要失去妳\
+因為我愛妳\
+我不想讓遠距離變問題\
+\
+但是為什麼\
+當我學會掏心掏肺的時候\
+妳的回應不如從前\
+當我們還是朋友的美好\
+\
+每天等著妳回覆的訊息\
+已經不知道我該選擇什麼\
+說了太多，妳不願意聆聽\
+說了太少，我們如此陌生\
+\
+想離開\
+卻不知道哪裡來的執著\
+不願鬆開的手\
+到底該怎樣讓自己\
+學會快樂\
+學會堅強\
+學會放下\
+\
+\
+\
+";
+		this.addDocument(input1);
+		this.addDocument(input2);
 
-		//console.log("traverse in pre order\n")
 		this._printTreeContent();				
+
+		//var sentense = "嗨你好嗎";
+		//console.log(this._toString(this._toBinary(sentense)));
 	},
 
 	_testTree: function() {
