@@ -16,5 +16,5 @@ WARNING: This project is now in development and used for academic purpose,
 
 ## Release History
 
-* 0.1.0 Initial release
+* 0.1.2 Initial release
 
