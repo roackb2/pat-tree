@@ -4,6 +4,7 @@ module.exports = PATtree;
 
 function PATtree() {
 	this.tree = new Tree(0);
+	this.documents = [];
 	this.maxSistringLength = 0;
 	this.index = 1;
 }
@@ -15,23 +16,28 @@ PATtree.prototype = {
 
 	addDocument: function(doc) {
 		var sentenses = this._splitDocument(doc);
+		var preIndex = this.documents.length.toString();
 		for(var i = 0; i < sentenses.length; i++) {
-			this._addSentense(sentenses[i]);
+			var index = preIndex + "." + i.toString();
+			this._addSentense(sentenses[i], index);
 		}
+		this.documents.push(sentenses);
 	},
 
-	_addSentense: function(sentense) {
+	_addSentense: function(sentense, sentenseIndex) {
+		var preIndex = sentenseIndex + ".";
 		for(var i = 0; i < sentense.length; i++) {
 			var charSistring = sentense.slice(i, sentense.length);
 			var sistring = this._toBinary(charSistring);
-			this._addSistring(sistring);
+			var index = preIndex + i.toString();
+			this._addSistring(sistring, index);
 			//console.log("\tafter adding sistring " + charSistring + ":\n");
 			//console.log("check connection: " + this._checkConnections());
 			//this._printTreeContent();			
 		}
 	},
 
-	_addSistring: function(sistring) {
+	_addSistring: function(sistring, index) {
 		var tree = this.tree;
 		if(sistring.length > this.maxSistringLength) {
 			this.maxSistringLength = sistring.length;
@@ -42,14 +48,15 @@ PATtree.prototype = {
 		}
 		this._appendZeroes(this.maxSistringLength);		
 		//console.log(sistring);
-		this._insert(tree, tree.root.id, sistring);
+		this._insert(tree, tree.root.id, sistring, index);
 	},
 
-	_insert: function(tree, nodeId, sistring) {
+	_insert: function(tree, nodeId, sistring, index) {
 		var node = tree.getNode(nodeId);
 		if(tree.isRoot(nodeId) && tree.root.data == null) {
 			tree.setNodeData(nodeId, {
 				type: this.EXTERNAL,
+				index: index,
 				sistring: sistring,
 				count: 1
 			});
@@ -70,11 +77,12 @@ PATtree.prototype = {
 						leftChild.data = {
 							type: this.EXTERNAL,
 							sistring: sistring,
+							index: index,
 							count: 1
 						};
 						tree.appendLeftChild(nodeId, leftChild);
 					} else {
-						this._insert(tree, node.left.id, sistring);
+						this._insert(tree, node.left.id, sistring, index);
 					}
 				} else if(branchBit == 1) {
 					if(node.right == null) {
@@ -82,30 +90,31 @@ PATtree.prototype = {
 						rightChild.data = {
 							type: this.EXTERNAL,
 							sistring: sistring,
+							index: index,
 							count: 1
 						}
 						tree.appendRightChild(nodeId, rightChild);
 					} else {
-						this._insert(tree, node.right.id, sistring);						
+						this._insert(tree, node.right.id, sistring, index);						
 					}
 				} else {
 					throw "invalid bit number";
 				}
 			} else { // the prefix of the sistring and all sistrings of the internal node do not match
-				this._rebuildInternalSubtree(tree, node, sistring);
+				this._rebuildInternalSubtree(tree, node, sistring, index);
 			}
 		} else if(node.data.type == this.EXTERNAL) {
 			if(node.data.sistring == sistring) {
 				node.data.count++;
 			} else {
-				this._rebuildInternalSubtree(tree, node, sistring);
+				this._rebuildInternalSubtree(tree, node, sistring, index);
 			}
 		} else {
 			throw "invalid node type (neither internal nor external)";
 		}
 	},
 
-	_rebuildInternalSubtree: function(tree, node, sistring) {
+	_rebuildInternalSubtree: function(tree, node, sistring, index) {
 		/*
 		if(!this._checkConnections()) {
 			throw "tree broken";
@@ -129,6 +138,7 @@ PATtree.prototype = {
 		externalNode.data = {
 			type: this.EXTERNAL,
 			sistring: sistring,
+			index: index,
 			count: 1
 		};
 
@@ -229,6 +239,32 @@ PATtree.prototype = {
 		return output;
 	},
 
+	_restoreSistring: function(sistring, index) {
+		var indexes = index.split(".");
+		var docIndex = indexes[0];
+		var sentenseIndex = indexes[1];
+		var wordIndex = indexes[2];
+
+		//console.log(" doc index: " + docIndex);
+		//console.log(" sentense index: " + sentenseIndex);
+		//console.log(" word index: " + wordIndex);
+
+		var output = "";
+		var sentense = this.documents[docIndex][sentenseIndex];
+		//console.log(" sentense: " + sentense);
+		var comparison = "";
+		for(var i = wordIndex; i < sentense.length && comparison.length != sistring.length; i++) {
+			var arr = [];
+			var word = sentense[i];
+			arr.push(sentense[i]);
+			//console.log(" word: " + word);
+			comparison += this._toBinary(arr);
+			output += word;
+		}
+
+		return output;
+	},
+
 	_toString: function(b) {
 		var output = "";
 		var temp = 0;
@@ -263,11 +299,13 @@ PATtree.prototype = {
 				console.log("prefix: " + node.data.prefix);
 				console.log("sistrings: ");
 				for(var i = 0; i < node.data.sistrings.length; i++) {
-					console.log(" sistring: " + node.data.sistrings[i].data.sistring);
-					console.log(" count: " + node.data.sistrings[i].data.count);
+					var externalNodeData = node.data.sistrings[i].data;
+					console.log(" sistring: " + owner._restoreSistring(externalNodeData.sistring, externalNodeData.index));
+					console.log(" count: " + externalNodeData.count);
 				}				
 			} else if(node.data.type == owner.EXTERNAL) {
-				console.log("sistring: " + node.data.sistring);
+				console.log("sistring: " + owner._restoreSistring(node.data.sistring, node.data.index));
+				console.log("index: " + node.data.index);
 				console.log("count: " + node.data.count);
 			}
 			console.log();
@@ -314,45 +352,46 @@ PATtree.prototype = {
 沒想到卻也吸引到我們這群老小孩，目的卻也達到了。 \
 最後真的推薦各位快到北師美術館體驗郊遊這齣電影，與蔡明亮近距離互動，畢竟很多感受沒辦法透過言語傳達。一如 \"拉拉拉拉～\" \"哎呀吼嗨呀～\""; 
 		var input2 = "#覺得絕望 \
-\
-\
-我並不是喜歡等待\
-我並不是習慣等待\
-\
-因為我愛妳\
-我去習慣了所有不喜歡\
-因為我愛妳\
-我努力的為了將來在拼\
-因為我愛妳\
-我真的很不想要失去妳\
-因為我愛妳\
-我不想讓遠距離變問題\
-\
-但是為什麼\
-當我學會掏心掏肺的時候\
-妳的回應不如從前\
-當我們還是朋友的美好\
-\
-每天等著妳回覆的訊息\
-已經不知道我該選擇什麼\
-說了太多，妳不願意聆聽\
-說了太少，我們如此陌生\
-\
-想離開\
-卻不知道哪裡來的執著\
-不願鬆開的手\
-到底該怎樣讓自己\
-學會快樂\
-學會堅強\
-學會放下\
-\
-\
-\
+ \
+ \
+我並不是喜歡等待 \
+我並不是習慣等待 \
+ \
+因為我愛妳 \
+我去習慣了所有不喜歡 \
+因為我愛妳 \
+我努力的為了將來在拼 \
+因為我愛妳 \
+我真的很不想要失去妳 \
+因為我愛妳 \
+我不想讓遠距離變問題 \
+ \
+但是為什麼 \
+當我學會掏心掏肺的時候 \
+妳的回應不如從前 \
+當我們還是朋友的美好 \
+ \
+每天等著妳回覆的訊息 \
+已經不知道我該選擇什麼 \
+說了太多，妳不願意聆聽 \
+說了太少，我們如此陌生 \
+ \
+想離開 \
+卻不知道哪裡來的執著 \
+不願鬆開的手 \
+到底該怎樣讓自己 \
+學會快樂 \
+學會堅強 \
+學會放下 \
+ \
+ \
+ \
 ";
 		this.addDocument(input1);
-		this.addDocument(input2);
+		//this.addDocument(input2);
 
-		this._printTreeContent();				
+		this._printTreeContent();		
+		console.log(this.documents);		
 
 		//var sentense = "嗨你好嗎";
 		//console.log(this._toString(this._toBinary(sentense)));
