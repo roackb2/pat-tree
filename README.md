@@ -16,5 +16,6 @@ WARNING: This project is now in development and used for academic purpose,
 
 ## Release History
 
-* 0.1.2 Initial release
-
+* 0.1.1 First release
+* 0.1.2 Construction complete
+* 0.1.3 Able to restore Chinese characters

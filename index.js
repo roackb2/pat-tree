@@ -14,6 +14,23 @@ PATtree.prototype = {
 	INTERNAL: "internal",
 	EXTERNAL: "external",
 
+
+	traverse: function(preCallback, inCallback, postCallback) {
+		this.tree.traverse(preCallback, inCallback, postCallback);
+	},
+
+	preOrderTraverse: function(callback) {
+		this.tree.preOrderTraverse(callback);
+	},
+
+	inOrderTraverse: function(callback) {
+		this.tree.inOrderTraverse(callback);
+	},
+
+	postOrderTraverse: function(callback) {
+		this.tree.postOrderTraverse(callback);
+	},
+
 	addDocument: function(doc) {
 		var sentenses = this._splitDocument(doc);
 		var preIndex = this.documents.length.toString();
@@ -53,12 +70,13 @@ PATtree.prototype = {
 
 	_insert: function(tree, nodeId, sistring, index) {
 		var node = tree.getNode(nodeId);
+		var indexes = [];
+		indexes.push(index);
 		if(tree.isRoot(nodeId) && tree.root.data == null) {
 			tree.setNodeData(nodeId, {
 				type: this.EXTERNAL,
-				index: index,
-				sistring: sistring,
-				count: 1
+				sistring: sistring,				
+				indexes: indexes
 			});
 		} else if(node.data.type == this.INTERNAL) {
 			var prefix = node.data.prefix;
@@ -77,8 +95,7 @@ PATtree.prototype = {
 						leftChild.data = {
 							type: this.EXTERNAL,
 							sistring: sistring,
-							index: index,
-							count: 1
+							indexes: indexes						
 						};
 						tree.appendLeftChild(nodeId, leftChild);
 					} else {
@@ -90,8 +107,7 @@ PATtree.prototype = {
 						rightChild.data = {
 							type: this.EXTERNAL,
 							sistring: sistring,
-							index: index,
-							count: 1
+							indexes: indexes
 						}
 						tree.appendRightChild(nodeId, rightChild);
 					} else {
@@ -105,7 +121,7 @@ PATtree.prototype = {
 			}
 		} else if(node.data.type == this.EXTERNAL) {
 			if(node.data.sistring == sistring) {
-				node.data.count++;
+				node.data.indexes.push(index);
 			} else {
 				this._rebuildInternalSubtree(tree, node, sistring, index);
 			}
@@ -122,6 +138,8 @@ PATtree.prototype = {
 		*/
 		var nodeString;
 		var sistrings = [];
+		var indexes = [];
+		indexes.push(index);
 
 		if(node.data.type == this.INTERNAL) {
 			nodeString = node.data.prefix;
@@ -138,8 +156,7 @@ PATtree.prototype = {
 		externalNode.data = {
 			type: this.EXTERNAL,
 			sistring: sistring,
-			index: index,
-			count: 1
+			indexes: indexes
 		};
 
 		sistrings.push(externalNode);
@@ -239,7 +256,9 @@ PATtree.prototype = {
 		return output;
 	},
 
-	_restoreSistring: function(sistring, index) {
+	_restoreSistring: function(externalNode) {
+		var sistring = externalNode.data.sistring;
+		var index = externalNode.data.indexes[0];
 		var indexes = index.split(".");
 		var docIndex = indexes[0];
 		var sentenseIndex = indexes[1];
@@ -265,6 +284,36 @@ PATtree.prototype = {
 		return output;
 	},
 
+	_restorePrefix: function(internalNode) {
+		var prefix = internalNode.data.prefix;
+		var externalNode = internalNode.data.sistrings[0];
+		var index = externalNode.data.indexes[0];
+		var indexes = index.split(".");
+		var docIndex = indexes[0];
+		var sentenseIndex = indexes[1];
+		var wordIndex = indexes[2];
+
+		var output = "";
+		var sentense = this.documents[docIndex][sentenseIndex];
+		//console.log(" sentense: " + sentense);
+		var comparison = "";
+		for(var i = wordIndex; i < sentense.length && comparison.length < prefix.length; i++) {
+			var arr = [];
+			var word = sentense[i];
+			arr.push(sentense[i]);
+			//console.log(" word: " + word);
+
+			var binaryWord = this._toBinary(arr);
+			if(comparison.length + binaryWord.length >= prefix.length) {
+				break;
+			} else {
+				comparison += binaryWord;
+				output += word;
+			}
+		}
+		return output;
+	},
+
 	_toString: function(b) {
 		var output = "";
 		var temp = 0;
@@ -286,7 +335,7 @@ PATtree.prototype = {
 	_printTreeContent: function() {
 		var tree = this.tree;
 		var owner = this;
-		tree.preOrderTraverse(function(node) {
+		this.preOrderTraverse(function(node) {
 			console.log("id: " + node.id);
 			var type = tree.getNodeType(node.id);
 			console.log(type);
@@ -296,17 +345,17 @@ PATtree.prototype = {
 			console.log("type: " + node.data.type);
 			if(node.data.type == owner.INTERNAL) {
 				console.log("position: " + node.data.position);
-				console.log("prefix: " + node.data.prefix);
+				console.log("prefix: " + owner._restorePrefix(node));
 				console.log("sistrings: ");
 				for(var i = 0; i < node.data.sistrings.length; i++) {
-					var externalNodeData = node.data.sistrings[i].data;
-					console.log(" sistring: " + owner._restoreSistring(externalNodeData.sistring, externalNodeData.index));
-					console.log(" count: " + externalNodeData.count);
+					var externalNode = node.data.sistrings[i];
+					console.log(" sistring: " + owner._restoreSistring(externalNode));
+					console.log(" indexes: " + externalNode.data.indexes);
 				}				
 			} else if(node.data.type == owner.EXTERNAL) {
-				console.log("sistring: " + owner._restoreSistring(node.data.sistring, node.data.index));
-				console.log("index: " + node.data.index);
-				console.log("count: " + node.data.count);
+				console.log("indexes: " + node.data.indexes);				
+				console.log("sistring: " + owner._restoreSistring(node));
+				console.log("indexes: " + node.data.indexes);
 			}
 			console.log();
 		});		
