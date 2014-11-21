@@ -66,6 +66,7 @@ PATtree.prototype = {
 		this._appendZeroes(this.maxSistringLength);		
 		//console.log(sistring);
 		this._insert(tree, tree.root.id, sistring, index);
+		this._updateParents();				
 	},
 
 	_insert: function(tree, nodeId, sistring, index) {
@@ -136,17 +137,16 @@ PATtree.prototype = {
 			throw "tree broken";
 		}
 		*/
+
 		var nodeString;
-		var sistrings = [];
 		var indexes = [];
+
 		indexes.push(index);
 
 		if(node.data.type == this.INTERNAL) {
 			nodeString = node.data.prefix;
-			sistrings = sistrings.concat(node.data.sistrings);
 		} else if(node.data.type == this.EXTERNAL) {
 			nodeString = node.data.sistring;
-			sistrings.push(node);
 		}
 		var branchBit = this._findBranchPosition(nodeString, sistring);
 		var parent = node.parent;
@@ -159,14 +159,15 @@ PATtree.prototype = {
 			indexes: indexes
 		};
 
-		sistrings.push(externalNode);
 
 		var subtreeRoot = subtree.getRoot();
 		subtreeRoot.data = {
 			type: this.INTERNAL,
 			position: branchBit,
 			prefix: sistring.slice(0, branchBit),
-			sistrings: sistrings
+			externalNodeNum: 0,
+			totalFrequency: 0,			
+			sistrings: []
 		};
 
 
@@ -200,11 +201,57 @@ PATtree.prototype = {
 		} else if(type == "right") {
 			tree.appendRightChild(parent.id, subtree);
 		}
+
 		/*
 		if(!this._checkConnections()) {
 			throw "tree broken while inserting sistring " + sistring;
 		}
 		*/
+	},
+
+	_updateParents: function() {
+		var owner = this;
+		this.postOrderTraverse(function(node) {
+			if(node.data.type == owner.INTERNAL) {
+				var sistrings = [];
+				var left = node.left;
+				var right = node.right;
+				var externalNodeNum = 0;
+				var totalFrequency = 0;
+				if(left && right) {
+					if(left.data.type == owner.INTERNAL) {
+						externalNodeNum += left.data.externalNodeNum;
+						totalFrequency += left.data.totalFrequency;
+						sistrings = sistrings.concat(left.data.sistrings);						
+					} else if(left.data.type == owner.EXTERNAL) {
+						externalNodeNum += 1;
+						totalFrequency += left.data.indexes.length;
+						sistrings.push(left);						
+					} else {
+						console.trace();
+						throw "unknown node type (neither internal nor external)"
+					}
+					if(right.data.type == owner.INTERNAL) {
+						externalNodeNum += right.data.externalNodeNum;
+						totalFrequency += right.data.totalFrequency;
+						sistrings = sistrings.concat(right.data.sistrings);						
+					} else if(right.data.type == owner.EXTERNAL) {
+						externalNodeNum += 1;
+						totalFrequency += right.data.indexes.length;
+						sistrings.push(right);						
+					} else {
+						console.trace();
+						throw "unknown node type (neither internal nor external)"
+					}
+				} else {
+					console.trace();
+					throw "internal node lost left or right child"
+				}
+				node.data.sistrings = sistrings;
+				node.data.externalNodeNum = externalNodeNum;
+				node.data.totalFrequency = totalFrequency;
+			}
+		});
 	},
 
 	_appendZeroes: function(length) {
@@ -332,7 +379,7 @@ PATtree.prototype = {
 		return sentenses;
 	},
 
-	_printTreeContent: function() {
+	printTreeContent: function(printExternalNodes, printDocuments) {
 		var tree = this.tree;
 		var owner = this;
 		this.preOrderTraverse(function(node) {
@@ -346,19 +393,29 @@ PATtree.prototype = {
 			if(node.data.type == owner.INTERNAL) {
 				console.log("position: " + node.data.position);
 				console.log("prefix: " + owner._restorePrefix(node));
-				console.log("sistrings: ");
-				for(var i = 0; i < node.data.sistrings.length; i++) {
-					var externalNode = node.data.sistrings[i];
-					console.log(" sistring: " + owner._restoreSistring(externalNode));
-					console.log(" indexes: " + externalNode.data.indexes);
-				}				
+				console.log("externalNodeNum: " + node.data.externalNodeNum);
+				console.log("totalFrequency: " + node.data.totalFrequency);
+				if(printExternalNodes)
+				{
+					console.log("sistrings: ");
+					for(var i = 0; i < node.data.sistrings.length; i++) {
+						var externalNode = node.data.sistrings[i];
+						console.log(" sistring: " + owner._restoreSistring(externalNode));
+						console.log(" indexes: " + externalNode.data.indexes);
+					}								
+				}
+	
 			} else if(node.data.type == owner.EXTERNAL) {
-				console.log("indexes: " + node.data.indexes);				
 				console.log("sistring: " + owner._restoreSistring(node));
 				console.log("indexes: " + node.data.indexes);
 			}
 			console.log();
-		});		
+		});	
+		if(printDocuments)
+		{
+			console.log("documents:");
+			console.log(this.documents); 	
+		}
 	},
 
 	_checkConnections: function() {
