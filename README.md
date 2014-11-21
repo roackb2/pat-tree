@@ -6,33 +6,33 @@ PAT tree construction for Chinese document, now in development.
 WARNING: This project is now in development and used for academic purpose,
 		 DO NOT use this module until the WARNING statement is removed.
 
-## Installation
+# Installation
 
 	npm install pat-tree --save
 
-## Test
+# Test
 	
 	npm test
 
-## Usage
+# Usage
 
-# Init
+## Init
 
 	var PATtree = require("pat-tree");
 	var tree = new PATtree();
 
-# Add document
+## Add document
 
 	tree.addDocument(input);
 
-# Print tree content
+## Print tree content
 
 	tree.printTreeContent(printExternalNodes, printDocuments);
 
 If **printExternalNodes** is set to true, print out all external nodes for each internal node.
 If **printDocuments** is set to true, print out the whole collection of the tree.
 
-# Traversal
+## Traversal
 
 	tree.traverse(preCallback, inCallback, postCallback);
 
@@ -48,9 +48,9 @@ For example
 		console.log("node id: " + node.id);
 	})
 
-## Data type
+# Data type
 
-# Node
+## Node
 
 Every nodes has some common informaitons, an node has the following structure:
 
@@ -65,7 +65,7 @@ Every nodes has some common informaitons, an node has the following structure:
 Data is different for internal nodes and external nodes,
 Internal nodes has following structure:
 	
-# Internal nodes
+## Internal nodes
 
 	internalNode.data = {
 		type: "internal",  // indicates this is an internal node
@@ -76,7 +76,7 @@ Internal nodes has following structure:
 		sistrings: ArrayOfExternalNodes // array of external nodes, data type: array
 	}
 
-# External nodes
+## External nodes
 
 External nodes has following structure:
 
@@ -86,7 +86,7 @@ External nodes has following structure:
 		indexes: ["0.1,3", "1.2.5"] // the positions where the sistring appears in the collection, data type: array
 	}
 
-## Collection
+# Collection
 
 The whole collection consists of documents, which consists of sentenses, which consists of words.
 An example could be this:
@@ -102,7 +102,7 @@ An index is in following structure:
 
 For example, **"0.1.2"** is the index of the character "測".
 
-## Release History
+# Release History
 
 * 0.1.1 First release
 * 0.1.2 Construction complete
