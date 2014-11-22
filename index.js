@@ -31,6 +31,78 @@ PATtree.prototype = {
 		this.tree.postOrderTraverse(callback);
 	},
 
+	extractSLP: function(TFTrheshold, SETreshold) {
+		var owner = this;
+		var totalFrequency = this.tree.root.data.totalFrequency;
+		var lexicalPatters = [];
+		var result = [];
+		this.preOrderTraverse(function(node) {
+			if(node.data.type == owner.INTERNAL) {
+				var sistring = owner._restorePrefix(node);
+				if(sistring != "" && node.data.totalFrequency > TFTrheshold) {
+					var map = {};
+					map.sistring = sistring;
+					map.frequency = node.data.totalFrequency / totalFrequency;
+					map.candidate = true;
+					map.se = -1;
+					lexicalPatters.push(map);
+				}
+			}
+		})
+		//console.log("lexical patterns count: " + lexicalPatters.length);
+		lexicalPatters.sort(function(item1, item2) {
+			return item2.sistring.length - item1.sistring.length;
+		});
+
+		for(var i = 0; i < lexicalPatters.length; i++) {
+			var sistring = lexicalPatters[i].sistring;
+			//console.log("sistring: " + sistring);
+			var fstOverlapIndex = -1;
+			var sndOverlapIndex = -1;
+			var fstOverlapString = sistring.slice(0, sistring.length - 1);
+			var sndOverlapString = sistring.slice(1, sistring.length);
+
+			for(var j = i; j < lexicalPatters.length; j++) {
+				if(lexicalPatters[j].sistring == fstOverlapString) {
+					fstOverlapIndex = j;
+				}
+				if(lexicalPatters[j].sistring == sndOverlapString) {
+					sndOverlapIndex = j;
+				}
+			}
+
+			var map = lexicalPatters[i];
+			var fstOverlap;
+			var sndOverlap;
+			if(fstOverlapIndex != -1 && sndOverlapIndex != -1) {
+				fstOverlap = lexicalPatters[fstOverlapIndex];				
+				sndOverlap = lexicalPatters[sndOverlapIndex];	
+				map.se = map.frequency / (fstOverlap.frequency + sndOverlap.frequency - map.frequency);							
+			} else if(fstOverlapIndex != -1) {
+				fstOverlap = lexicalPatters[fstOverlapIndex];				
+				map.se = map.frequency / (fstOverlap.frequency - map.frequency);				
+			} else if(sndOverlapIndex != -1) {
+				sndOverlap = lexicalPatters[sndOverlapIndex];	
+				map.se = map.frequency / (sndOverlap.frequency - map.frequency);
+			}
+
+			if(map.se > SETreshold) {
+				if(fstOverlapIndex != -1) {
+					fstOverlap.candidate = false;					
+				} 
+				if(sndOverlapIndex != -1) {
+					sndOverlap.candidate = false;
+				}
+			}
+
+			if(map.candidate && result.indexOf(map.sistring) == -1) {
+				result.push(map.sistring);
+			}
+			//console.log("end of processing " + i + "th item");
+		} 
+		return result;
+	},
+
 	addDocument: function(doc) {
 		var sentenses = this._splitDocument(doc);
 		var preIndex = this.documents.length.toString();

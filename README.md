@@ -32,6 +32,16 @@ WARNING: This project is now in development and used for academic purpose,
 If **printExternalNodes** is set to true, print out all external nodes for each internal node.
 If **printDocuments** is set to true, print out the whole collection of the tree.
 
+## Extract Significant Lexical Patterns
+
+	var SLPs = tree.extractSLP(TFThreshold, SEThreshold); // SLPs: array of signifiant lexical patterns.
+
+If the frequency of a pattern exceeds **THThreshold**, 
+and the SE value exceeds **SEThreshold**, it would appear in the result array.
+
+**THTreshold** shold be integer, **SEThreshold** shold be between 0 and 1.
+
+
 ## Traversal
 
 	tree.traverse(preCallback, inCallback, postCallback);
@@ -108,3 +118,4 @@ For example, **"0.1.2"** is the index of the character "測".
 * 0.1.2 Construction complete
 * 0.1.3 Able to restore Chinese characters
 * 0.1.4 Add external node number and term frequency to internal nodes
+* 0.1.5 Add functionality of SLP extraction
