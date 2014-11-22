@@ -114,8 +114,9 @@ For example, **"0.1.2"** is the index of the character "測".
 
 # Release History
 
-* 0.1.1 First release
-* 0.1.2 Construction complete
-* 0.1.3 Able to restore Chinese characters
-* 0.1.4 Add external node number and term frequency to internal nodes
 * 0.1.5 Add functionality of SLP extraction
+* 0.1.4 Add external node number and term frequency to internal nodes
+* 0.1.3 Able to restore Chinese characters
+* 0.1.2 Construction complete
+* 0.1.1 First release
+
