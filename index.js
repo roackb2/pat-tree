@@ -122,7 +122,7 @@ PATtree.prototype = {
 			this._addSistring(sistring, index);
 			//console.log("\tafter adding sistring " + charSistring + ":\n");
 			//console.log("check connection: " + this._checkConnections());
-			//this._printTreeContent();			
+			//this.printTreeContent();			
 		}
 	},
 
@@ -137,16 +137,16 @@ PATtree.prototype = {
 		}
 		this._appendZeroes(this.maxSistringLength);		
 		//console.log(sistring);
-		this._insert(tree, tree.root.id, sistring, index);
+		this._insert(tree, tree.root, sistring, index);
 		this._updateParents();				
 	},
 
-	_insert: function(tree, nodeId, sistring, index) {
-		var node = tree.getNode(nodeId);
+	_insert: function(tree, node, sistring, index) {
+		//var node = tree.getNode(nodeId);
 		var indexes = [];
 		indexes.push(index);
-		if(tree.isRoot(nodeId) && tree.root.data == null) {
-			tree.setNodeData(nodeId, {
+		if(tree.isRoot(node) && tree.root.data == null) {
+			tree.setNodeData(node, {
 				type: this.EXTERNAL,
 				sistring: sistring,				
 				indexes: indexes
@@ -170,9 +170,9 @@ PATtree.prototype = {
 							sistring: sistring,
 							indexes: indexes						
 						};
-						tree.appendLeftChild(nodeId, leftChild);
+						tree.appendLeftChild(node, leftChild);
 					} else {
-						this._insert(tree, node.left.id, sistring, index);
+						this._insert(tree, node.left, sistring, index);
 					}
 				} else if(branchBit == 1) {
 					if(node.right == null) {
@@ -182,9 +182,9 @@ PATtree.prototype = {
 							sistring: sistring,
 							indexes: indexes
 						}
-						tree.appendRightChild(nodeId, rightChild);
+						tree.appendRightChild(node, rightChild);
 					} else {
-						this._insert(tree, node.right.id, sistring, index);						
+						this._insert(tree, node.right, sistring, index);						
 					}
 				} else {
 					throw "invalid bit number";
@@ -244,22 +244,22 @@ PATtree.prototype = {
 
 
 
-		var type = tree.getNodeType(node.id);
+		var type = tree.getNodeType(node);
 
 		if(type == "left") {
-			tree.detachLeftChild(parent.id);
+			tree.detachLeftChild(parent);
 		} else if(type == "right") {
-			tree.detachRightChild(parent.id);
+			tree.detachRightChild(parent);
 		}
 
 		var nodeBranchBit = nodeString[branchBit].valueOf();
 		var sistringBranchBit = sistring[branchBit].valueOf();
 		if(nodeBranchBit == 0 && sistringBranchBit == 1) {
-			subtree.appendLeftChild(subtreeRoot.id, node);
-			subtree.appendRightChild(subtreeRoot.id, externalNode);
+			subtree.appendLeftChild(subtreeRoot, node);
+			subtree.appendRightChild(subtreeRoot, externalNode);
 		} else if(nodeBranchBit == 1 && sistringBranchBit == 0){
-			subtree.appendLeftChild(subtreeRoot.id, externalNode);
-			subtree.appendRightChild(subtreeRoot.id, node);
+			subtree.appendLeftChild(subtreeRoot, externalNode);
+			subtree.appendRightChild(subtreeRoot, node);
 		} else {
 			throw "wrong branch bit";
 		}
@@ -269,9 +269,9 @@ PATtree.prototype = {
 		if(type == "root") {
 			tree.root = subtree.root;
 		} else if(type == "left") {
-			tree.appendLeftChild(parent.id, subtree);					
+			tree.appendLeftChild(parent, subtree);					
 		} else if(type == "right") {
-			tree.appendRightChild(parent.id, subtree);
+			tree.appendRightChild(parent, subtree);
 		}
 
 		/*
@@ -456,7 +456,7 @@ PATtree.prototype = {
 		var owner = this;
 		this.preOrderTraverse(function(node) {
 			console.log("id: " + node.id);
-			var type = tree.getNodeType(node.id);
+			var type = tree.getNodeType(node);
 			console.log(type);
 			if(type != "root") {
 				console.log("parent: " + node.parent.id);
@@ -494,7 +494,7 @@ PATtree.prototype = {
 		var tree = this.tree;
 		var result = true;
 		tree.preOrderTraverse(function(node) {
-			if(!tree.isRoot(node.id)) {
+			if(!tree.isRoot(node)) {
 				var nodeId = node.id;
 				var parent = node.parent;
 				if(!parent) {
