@@ -12,10 +12,6 @@ This project is now in development and used for academic purpose,
 
 	npm install pat-tree --save
 
-# Test
-	
-	npm test
-
 # Usage
 
 ## Init
