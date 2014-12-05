@@ -81,7 +81,7 @@ Internal nodes has following structure:
 		prefix: "00101", // the sharing prefix of external nodes, data type: string of 0s and 1s
 		externalNodeNum: 87, // number of external nodes contained in subtree of this node, data type: integer
 		totalFrequency: 89, // number of the total frequency of the external nodes in the collection, data type: integer
-		sistrings: ArrayOfExternalNodes // array of external nodes, data type: array
+		sistringRepres: node // one of the external node in the subree of this internal node, data type: Node
 	}
 
 ## External nodes
@@ -100,9 +100,9 @@ The whole collection consists of documents, which consists of sentenses, which c
 An example could be this:
 
 	[ [ '嗨你好',
-    	'這是測試文件1' ],
+    	'這是測試文件' ],
   	  [ '你好',
-    	'這是測試文件2' ] ]
+    	'這是另外一個測試文件' ] ]
 
 An index is in following structure:
 
@@ -112,6 +112,7 @@ For example, **"0.1.2"** is the index of the character "測".
 
 # Release History
 
+* 0.1.8 Alter algorithm, improve simplicity
 * 0.1.7 Improve performance
 * 0.1.6 Improve performance
 * 0.1.5 Add functionality of SLP extraction

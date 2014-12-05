@@ -189,7 +189,7 @@ PATtree.prototype = {
 				} else {
 					throw "invalid bit number";
 				}
-			} else { // the prefix of the sistring and all sistrings of the internal node do not match
+			} else { // the prefix of the sistring and all sistringRepres of the internal node do not match
 				this._rebuildInternalSubtree(tree, node, sistring, index);
 			}
 		} else if(node.data.type == this.EXTERNAL) {
@@ -231,7 +231,6 @@ PATtree.prototype = {
 			indexes: indexes
 		};
 
-
 		var subtreeRoot = subtree.getRoot();
 		subtreeRoot.data = {
 			type: this.INTERNAL,
@@ -239,7 +238,7 @@ PATtree.prototype = {
 			prefix: sistring.slice(0, branchBit),
 			externalNodeNum: 0,
 			totalFrequency: 0,			
-			sistrings: []
+			sistringRepres: externalNode
 		};
 
 
@@ -285,7 +284,7 @@ PATtree.prototype = {
 
 	_updateParents: function(node) {
 		var owner = this;
-		var sistrings = [];
+		//var sistringRepres = [];
 		var left = node.left;
 		var right = node.right;
 		var externalNodeNum = 0;
@@ -294,11 +293,11 @@ PATtree.prototype = {
 			if(left.data.type == owner.INTERNAL) {
 				externalNodeNum += left.data.externalNodeNum;
 				totalFrequency += left.data.totalFrequency;
-				sistrings = sistrings.concat(left.data.sistrings);						
+				//sistringRepres = sistringRepres.concat(left.data.sistringRepres);						
 			} else if(left.data.type == owner.EXTERNAL) {
 				externalNodeNum += 1;
 				totalFrequency += left.data.indexes.length;
-				sistrings.push(left);						
+				//sistringRepres.push(left);						
 			} else {
 				console.trace();
 				throw "unknown node type (neither internal nor external)"
@@ -306,11 +305,11 @@ PATtree.prototype = {
 			if(right.data.type == owner.INTERNAL) {
 				externalNodeNum += right.data.externalNodeNum;
 				totalFrequency += right.data.totalFrequency;
-				sistrings = sistrings.concat(right.data.sistrings);						
+				//sistringRepres = sistringRepres.concat(right.data.sistringRepres);						
 			} else if(right.data.type == owner.EXTERNAL) {
 				externalNodeNum += 1;
 				totalFrequency += right.data.indexes.length;
-				sistrings.push(right);						
+				//sistringRepres.push(right);						
 			} else {
 				console.trace();
 				throw "unknown node type (neither internal nor external)"
@@ -319,7 +318,7 @@ PATtree.prototype = {
 			console.trace();
 			throw "internal node lost left or right child"
 		}
-		node.data.sistrings = sistrings;
+		//node.data.sistringRepres = sistringRepres;
 		node.data.externalNodeNum = externalNodeNum;
 		node.data.totalFrequency = totalFrequency;
 		if(node.parent) {
@@ -406,7 +405,7 @@ PATtree.prototype = {
 
 	_restorePrefix: function(internalNode) {
 		var prefix = internalNode.data.prefix;
-		var externalNode = internalNode.data.sistrings[0];
+		var externalNode = internalNode.data.sistringRepres;
 		var index = externalNode.data.indexes[0];
 		var indexes = index.split(".");
 		var docIndex = indexes[0];
@@ -470,12 +469,10 @@ PATtree.prototype = {
 				console.log("totalFrequency: " + node.data.totalFrequency);
 				if(printExternalNodes)
 				{
-					console.log("sistrings: ");
-					for(var i = 0; i < node.data.sistrings.length; i++) {
-						var externalNode = node.data.sistrings[i];
-						console.log(" sistring: " + owner._restoreSistring(externalNode));
-						console.log(" indexes: " + externalNode.data.indexes);
-					}								
+					console.log("sistringRepres: ");
+					var externalNode = node.data.sistringRepres;
+					console.log(" sistring: " + owner._restoreSistring(externalNode));
+					console.log(" indexes: " + externalNode.data.indexes);												
 				}
 	
 			} else if(node.data.type == owner.EXTERNAL) {
