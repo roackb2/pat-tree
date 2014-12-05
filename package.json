@@ -1,6 +1,6 @@
 {
   "name": "pat-tree",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "PAT tree construction for Chinese documents",
   "main": "index.js",
   "scripts": {

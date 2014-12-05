@@ -31,6 +31,25 @@ PATtree.prototype = {
 		this.tree.postOrderTraverse(callback);
 	},
 
+	splitDoc: function(doc, SLPs) {
+		var result = "";					;	
+		for(var i = 0; i < doc.length; i++) {
+			var subContent = doc.slice(i, doc.length);
+			var index = -1;
+			var keyword = doc.charAt(i);
+			for(var j = 0; j < SLPs.length; j++) {
+				index = subContent.indexOf(SLPs[j]);
+				if(index == 0) {
+					keyword = SLPs[j];
+					i += keyword.length - 1;
+					break;
+				}
+			}
+			result += " " + keyword;
+		}
+		return result;
+	},
+
 	extractSLP: function(TFTrheshold, SETreshold) {
 		var owner = this;
 		var totalFrequency = this.tree.root.data.totalFrequency;

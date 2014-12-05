@@ -7,12 +7,16 @@ PAT tree construction for Chinese document, now in development.
 
 This project is now in development and used for academic purpose,
 **DO NOT** use this module until the **WARNING** statement is removed.
+//TODO: improve document splitting algorithm
+
 
 # Installation
 
 	npm install pat-tree --save
 
+
 # Usage
+
 
 ## Init
 
@@ -23,13 +27,6 @@ This project is now in development and used for academic purpose,
 
 	tree.addDocument(input);
 
-## Print tree content
-
-	tree.printTreeContent(printExternalNodes, printDocuments);
-
-If **printExternalNodes** is set to true, print out all external nodes for each internal node.
-If **printDocuments** is set to true, print out the whole collection of the tree.
-
 ## Extract Significant Lexical Patterns
 
 	var SLPs = tree.extractSLP(TFThreshold, SEThreshold); // SLPs: array of signifiant lexical patterns.
@@ -39,6 +36,25 @@ and the SE value exceeds **SEThreshold**, it would appear in the result array.
 
 **THTreshold** shold be integer, **SEThreshold** shold be between 0 and 1.
 
+## Split document
+
+	var result = tree.splitDoc(doc, SLPs); 
+
+**doc** is the document to be splitted, data type: string
+**SLPs** is array of SLP that extracted by **tree.extractSLP()**, or array of keywords retrieved any other way.
+    data type: array of strings.
+**result** is the result of splitted document, data type: string.
+
+
+# Additional functions
+
+## Print tree content
+
+	tree.printTreeContent(printExternalNodes, printDocuments);
+
+Print the content of the tree on console.
+If **printExternalNodes** is set to true, print out all external nodes for each internal node.
+If **printDocuments** is set to true, print out the whole collection of the tree.
 
 ## Traversal
 
@@ -112,6 +128,7 @@ For example, **"0.1.2"** is the index of the character "測".
 
 # Release History
 
+* 0.2.0 Add document splitting functionality
 * 0.1.8 Alter algorithm, improve simplicity
 * 0.1.7 Improve performance
 * 0.1.6 Improve performance
