@@ -40,9 +40,11 @@ and the SE value exceeds **SEThreshold**, it would appear in the result array.
 
 	var result = tree.splitDoc(doc, SLPs); 
 
-**doc** is the document to be splitted, data type: string
+**doc** is the document to be splitted, data type: string.
+
 **SLPs** is array of SLP that extracted by **tree.extractSLP()**, or array of keywords retrieved any other way.
     data type: array of strings.
+    
 **result** is the result of splitted document, data type: string.
 
 
