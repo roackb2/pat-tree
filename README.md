@@ -2,6 +2,15 @@ pat-tree
 ========
 
 PAT tree construction for Chinese document, now in development.
+Provide functionality to add documents and construct PAT tree in memory,
+extract keywords, and split documents.
+
+example of result:
+
+	有時 喜歡   有時候 不喜歡
+	為什麼 會 這樣   … ？
+	20 點 求 解 哈哈
+
 
 # WARNING
 
@@ -44,9 +53,8 @@ and the SE value exceeds **SEThreshold**, it would appear in the result array.
 
 **SLPs** is array of SLP that extracted by **tree.extractSLP()**, or array of keywords retrieved any other way.
     data type: array of strings.
-    
-**result** is the result of splitted document, data type: string.
 
+**result** is the result of splitted document, data type: string.
 
 # Additional functions
 
