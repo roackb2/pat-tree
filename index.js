@@ -138,7 +138,7 @@ PATtree.prototype = {
 		this._appendZeroes(this.maxSistringLength);		
 		//console.log(sistring);
 		this._insert(tree, tree.root, sistring, index);
-		this._updateParents();				
+		//this._updateParents();				
 	},
 
 	_insert: function(tree, node, sistring, index) {
@@ -274,6 +274,8 @@ PATtree.prototype = {
 			tree.appendRightChild(parent, subtree);
 		}
 
+		this._updateParents(subtreeRoot);
+
 		/*
 		if(!this._checkConnections()) {
 			throw "tree broken while inserting sistring " + sistring;
@@ -281,49 +283,48 @@ PATtree.prototype = {
 		*/
 	},
 
-	_updateParents: function() {
+	_updateParents: function(node) {
 		var owner = this;
-		this.postOrderTraverse(function(node) {
-			if(node.data.type == owner.INTERNAL) {
-				var sistrings = [];
-				var left = node.left;
-				var right = node.right;
-				var externalNodeNum = 0;
-				var totalFrequency = 0;
-				if(left && right) {
-					if(left.data.type == owner.INTERNAL) {
-						externalNodeNum += left.data.externalNodeNum;
-						totalFrequency += left.data.totalFrequency;
-						sistrings = sistrings.concat(left.data.sistrings);						
-					} else if(left.data.type == owner.EXTERNAL) {
-						externalNodeNum += 1;
-						totalFrequency += left.data.indexes.length;
-						sistrings.push(left);						
-					} else {
-						console.trace();
-						throw "unknown node type (neither internal nor external)"
-					}
-					if(right.data.type == owner.INTERNAL) {
-						externalNodeNum += right.data.externalNodeNum;
-						totalFrequency += right.data.totalFrequency;
-						sistrings = sistrings.concat(right.data.sistrings);						
-					} else if(right.data.type == owner.EXTERNAL) {
-						externalNodeNum += 1;
-						totalFrequency += right.data.indexes.length;
-						sistrings.push(right);						
-					} else {
-						console.trace();
-						throw "unknown node type (neither internal nor external)"
-					}
-				} else {
-					console.trace();
-					throw "internal node lost left or right child"
-				}
-				node.data.sistrings = sistrings;
-				node.data.externalNodeNum = externalNodeNum;
-				node.data.totalFrequency = totalFrequency;
+		var sistrings = [];
+		var left = node.left;
+		var right = node.right;
+		var externalNodeNum = 0;
+		var totalFrequency = 0;
+		if(left && right) {
+			if(left.data.type == owner.INTERNAL) {
+				externalNodeNum += left.data.externalNodeNum;
+				totalFrequency += left.data.totalFrequency;
+				sistrings = sistrings.concat(left.data.sistrings);						
+			} else if(left.data.type == owner.EXTERNAL) {
+				externalNodeNum += 1;
+				totalFrequency += left.data.indexes.length;
+				sistrings.push(left);						
+			} else {
+				console.trace();
+				throw "unknown node type (neither internal nor external)"
 			}
-		});
+			if(right.data.type == owner.INTERNAL) {
+				externalNodeNum += right.data.externalNodeNum;
+				totalFrequency += right.data.totalFrequency;
+				sistrings = sistrings.concat(right.data.sistrings);						
+			} else if(right.data.type == owner.EXTERNAL) {
+				externalNodeNum += 1;
+				totalFrequency += right.data.indexes.length;
+				sistrings.push(right);						
+			} else {
+				console.trace();
+				throw "unknown node type (neither internal nor external)"
+			}
+		} else {
+			console.trace();
+			throw "internal node lost left or right child"
+		}
+		node.data.sistrings = sistrings;
+		node.data.externalNodeNum = externalNodeNum;
+		node.data.totalFrequency = totalFrequency;
+		if(node.parent) {
+			this._updateParents(node.parent);
+		}
 	},
 
 	_appendZeroes: function(length) {
