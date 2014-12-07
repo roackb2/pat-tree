@@ -178,7 +178,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 * 0.2.2 Change function name of splitDoc to segmentDoc
 * 0.2.1 Mofify README file
-* 0.2.0 Add document splitting functionality
+* 0.2.0 Add text segmentation functionality
 * 0.1.8 Alter algorithm, improve simplicity
 * 0.1.7 Improve performance
 * 0.1.6 Improve performance
