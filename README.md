@@ -53,17 +53,17 @@ and the SE value exceeds `SEThreshold`, it would appear in the result array.
 
 `TFTreshold` should be integer, `SEThreshold` should be float between 0 and 1.
 
-### Split document
+### Text segmentation
 
 ```javascript
-var result = tree.splitDoc(doc, SLPs); 
+var result = tree.segmentDoc(doc, SLPs); 
 ```
 
-`doc` is the document to split, data type: string.
+`doc` is the document to be segmented, data type: string.
 
 `SLPs` is array of SLP that extracted by `tree.extractSLP()`, or array of keywords retrieved any other way, data type: array of strings.
 
-`result` is the result of splitted document, data type: string.
+`result` is the result of document segmentation, data type: string.
 
 # Additional functions
 
@@ -176,6 +176,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 # Release History
 
+* 0.2.2 Change function name of splitDoc to segmentDoc
 * 0.2.1 Mofify README file
 * 0.2.0 Add document splitting functionality
 * 0.1.8 Alter algorithm, improve simplicity

@@ -31,7 +31,7 @@ PATtree.prototype = {
 		this.tree.postOrderTraverse(callback);
 	},
 
-	splitDoc: function(doc, SLPs) {
+	segmentDoc: function(doc, SLPs) {
 		var result = "";					;	
 		for(var i = 0; i < doc.length; i++) {
 			var subContent = doc.slice(i, doc.length);

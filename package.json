@@ -1,7 +1,7 @@
 {
   "name": "pat-tree",
-  "version": "0.2.1",
-  "description": "PAT tree construction for Chinese documents",
+  "version": "0.2.2",
+  "description": "PAT tree construction for Chinese documents, keyword extraction and text segmentation",
   "main": "index.js",
   "scripts": {
     "test": "make test"
@@ -12,8 +12,12 @@
   },
   "keywords": [
     "node",
+    "pat-tree",
+    "pat tree",
     "PAT",
-    "tree"
+    "tree",
+    "keyword extraction",
+    "text segmentation"
   ],
   "author": "Jay Liang <roackb2@gmail.com> (https://www.facebook.com/profile.php?id=1391931108)",
   "license": "MIT",
