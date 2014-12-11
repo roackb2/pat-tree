@@ -2,7 +2,7 @@ pat-tree
 ========
 
 PAT tree construction for Chinese document, now in development.
-Provide functionality to add documents and construct PAT tree in memory,
+Provide functionality to add documents and construct PAT tree in memory, store it to database,
 extract keywords, and split documents.
 
 example of result:
@@ -71,15 +71,15 @@ var result = tree.segmentDoc(doc, SLPs);
 var json = tree.toJSON(); 
 ```
 The result json has following three keys:
-`header`: JSON object,
-`documents`: array,
-`tree`: array
+	`header`: JSON object,
+	`documents`: array,
+	`tree`: array
 
-You could store them to database and use reborn to generate the tree again.
-If using mongoDB, you can store the three items to seperate collections,
+You could store them to database and use `tree.reborn()` to generate the tree again.
+In NoSQL database, you can store the three items to seperate collections,
 `header` collection would contain exactly one document, and `documents` and `tree` would contain lots of documents.
 
-For Example, if using mongodb:
+For Example, if using MongoDB native driver:
 ```javascript
 	var json = tree.toJSON();
 
@@ -104,10 +104,10 @@ For Example, if using mongodb:
 ```javascript
 tree.reborn(json);
 ```
-If you use `tree.toJSON()` to generate JSON object and store the three keys to different collections, 
+If you use `tree.toJSON()` to generate JSON object and store the three items to different collections, 
 you can construct them to the original JSON object and use `tree.reborn(json)` to reborn the tree.
 
-For example, if using mongodb:
+For example, if using MongoDB native driver:
 ```javascript
 	db.collection("header").find().toArray(function(err, headers) {
 		db.collection("documents").find().toArray(function(err, documents) {
@@ -123,6 +123,10 @@ For example, if using mongodb:
 		})
 	})	
 ```
+Then you can use all functions of this libranry to `patTree`, for example, 
+you can add one more document with `patTree.addDocument(doc)` and extract SLPs,
+and then store the tree back to database. Notice that, if you need the SLPs, 
+you should store them to database manually.
 
 # Additional functions
 
