@@ -123,7 +123,7 @@ For example, if using MongoDB native driver:
 		})
 	})	
 ```
-Then you can use all functions of this libranry to `patTree`, for example, 
+Then you can use all functions of this module to `patTree`, for example, 
 you can add one more document with `patTree.addDocument(doc)` and extract SLPs,
 and then store the tree back to database. Notice that, if you need the SLPs, 
 you should store them to database manually.
