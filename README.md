@@ -65,6 +65,65 @@ var result = tree.segmentDoc(doc, SLPs);
 
 `result` is the result of document segmentation, data type: string.
 
+### Convert to JSON
+
+```javascript
+var json = tree.toJSON(); 
+```
+The result json has following three keys:
+`header`: JSON object,
+`documents`: array,
+`tree`: array
+
+You could store them to database and use reborn to generate the tree again.
+If using mongoDB, you can store the three items to seperate collections,
+`header` collection would contain exactly one document, and `documents` and `tree` would contain lots of documents.
+
+For Example, if using mongodb:
+```javascript
+	var json = tree.toJSON();
+
+	db.collection("header").insert(json.header, function(err, result) {
+		if(err) throw err;
+	});
+	for(var i = 0; i < json.documents.length; i++) {
+		db.collection("documents").insert(json.documents[i], function(err, result) {
+			if(err) throw err;
+		});
+	}
+	for(var i = 0; i < json.tree.length; i++) {
+		db.collection("tree").insert(json.tree[i], function(err, result) {
+			if(err) throw err;				
+		});
+	}
+```
+
+
+### Reborn
+
+```javascript
+tree.reborn(json);
+```
+If you use `tree.toJSON()` to generate JSON object and store the three keys to different collections, 
+you can construct them to the original JSON object and use `tree.reborn(json)` to reborn the tree.
+
+For example, if using mongodb:
+```javascript
+	db.collection("header").find().toArray(function(err, headers) {
+		db.collection("documents").find().toArray(function(err, documents) {
+			db.collection("tree").find().toArray(function(err, tree) {
+				var json = {};
+				json.header = headers[0];
+				json.documents = documents;
+				json.tree = tree;
+
+				var patTree = new PATTree();
+				patTree.reborn(json);
+			})
+		})
+	})	
+```
+
 # Additional functions
 
 ### Print tree content
@@ -107,21 +166,22 @@ Every nodes has some common informaitons, an node has the following structure:
 
 ```javascript
 	node = {
-		id: 3,        // the id of this node, data type: JSON, auto generated.
+		id: 3,        // the id of this node, data type: integer, auto generated.
 		parent: 1,    // the parent id of this node, data type: integer
 		left: leftChildNode,      // data type: Node 
 		right: rightChildNode,    // data type: Node
-		data: {}     // payload for this node, data type : JSON
 	}
 ```
 
-Data is different for internal nodes and external nodes,
+Other attributes in nodes are different for internal nodes and external nodes,
 Internal nodes has following structure:
 	
 ### Internal nodes
 
 ```javascript
-	internalNode.data = {
+	internalNode = {
+		// ... 
+
 		type: "internal", 
         // indicates this is an internal node
 		position: 13,
@@ -145,7 +205,9 @@ Internal nodes has following structure:
 External nodes has following structure:
 
 ```javascript
-	externalNode.data = {
+	externalNode = {
+		// ...
+
 		type: "external", 
         // indicates this is an external node,
 		sistring: "00101100110101", 
@@ -176,6 +238,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 # Release History
 
+* 0.2.3 Add functions toJSON() and reborn()
 * 0.2.2 Change function name of splitDoc to segmentDoc
 * 0.2.1 Mofify README file
 * 0.2.0 Add text segmentation functionality
