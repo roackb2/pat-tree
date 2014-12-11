@@ -62,26 +62,33 @@ PATtree.prototype = {
 		var nodes = [];
 		for(var i = 0; i < json.tree.length; i++) {
 			var node = new Node();
-			nodes.push(node.reborn(json.tree[i]));
+			nodes[json.tree[i].id] = node.reborn(json.tree[i]);
 		}
 		for(var i = 0; i < nodes.length; i++) {
-			var node = nodes[i];
-			if(node.parent) {
-				node.parent = nodes[node.parent];
-			} else {
-				this.tree.root = node;
+			if(nodes[i]) {
+				if(nodes[i].id != i) {
+					correct = false;
+					throw "index and id not aligned, index: " + i + ", id: " + nodes[i].id; 
+				}
+				var node = nodes[i];
+				if(node.parent != null) {
+					node.parent = nodes[node.parent];
+				} else {
+					this.tree.root = node;
+				}
+				if(node.left != null) {
+					node.left = nodes[node.left];
+				}
+				if(node.right != null) {
+					node.right = nodes[node.right];
+				}
+				if(node.sistringRepres) {
+					node.sistringRepres = nodes[node.sistringRepres];
+				}				
 			}
-			if(node.left) {
-				node.left = nodes[node.left];
-			}
-			if(node.right) {
-				node.right = nodes[node.right];
-			}
-			if(node.sistringRepres) {
-				node.sistringRepres = nodes[node.sistringRepres];
-			}
+
 		}
-	},
+	}, 
 
 
 	traverse: function(preCallback, inCallback, postCallback) {
