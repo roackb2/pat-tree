@@ -221,9 +221,7 @@ PATtree.prototype = {
 			this.maxSistringLength = sistring.length;
 			this._appendZeroes(this.maxSistringLength);					
 		} else {
-			for(var i = sistring.length; i < this.maxSistringLength; i++) {
-				sistring += "0";
-			}			
+			sistring += Array(this.maxSistringLength - sistring.length + 1).join("0");		
 		}
 		this._insert(tree, tree.root, sistring, index);
 	},
@@ -320,7 +318,7 @@ PATtree.prototype = {
 			tree.detachRightChild(parent);
 		}
 
-		var nodeBranchBit = nodeString[branchBit].valueOf();
+		var nodeBranchBit = nodeString[branchBit].valueOf(); 
 		var sistringBranchBit = sistring[branchBit].valueOf();
 		if(nodeBranchBit == 0 && sistringBranchBit == 1) {
 			subtree.appendLeftChild(subtreeRoot, node);
