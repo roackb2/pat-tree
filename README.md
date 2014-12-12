@@ -83,19 +83,20 @@ For Example, if using MongoDB native driver:
 ```javascript
 	var json = tree.toJSON();
 
+	// One header object would be stored to database
 	db.collection("header").insert(json.header, function(err, result) {
 		if(err) throw err;
 	});
-	for(var i = 0; i < json.documents.length; i++) {
-		db.collection("documents").insert(json.documents[i], function(err, result) {
-			if(err) throw err;
-		});
-	}
-	for(var i = 0; i < json.tree.length; i++) {
-		db.collection("tree").insert(json.tree[i], function(err, result) {
-			if(err) throw err;				
-		});
-	}
+
+	// All documents would be stored to database
+	db.collection("documents").insert(json.documents, function(err, result) {
+		if(err) throw err;
+	});	
+
+	// All nodes of the tree would be stored to database
+	db.collection("tree").insert(json.tree, function(err, result) {
+		if(err) throw err;				
+	});	
 ```
 
 
