@@ -136,7 +136,7 @@ and you can do all operations like `patTree.addDocuments(doc)` to it.
 
 > **CATUION**
 > If you reborn the tree by above method, and do some operations like `patTree.addDocument(doc)`, 
-> and you want to store the tree back to database as illustrated in **Convert to JSON**, 
+> and you want to store the tree back to database as illustrated in *Convert to JSON*, 
 > you **MUST** drop the collections(header, documents, tree) in the database first,
 > avoiding any record that is previously stored.
 
