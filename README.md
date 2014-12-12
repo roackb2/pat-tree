@@ -124,10 +124,21 @@ For example, if using MongoDB native driver:
 		})
 	})	
 ```
+
 Then you can use all functions of this module to `patTree`, for example, 
 you can add one more document with `patTree.addDocument(doc)` and extract SLPs,
 and then store the tree back to database. Notice that, if you need the SLPs, 
 you should store them to database manually.
+
+**CATUION**
+
+These three collectinos `header`, `documents`, `tree` 
+represent the status of the tree, if you want to reborn from these collections,
+All of them are required for reborn to success. Also, if you rebron a tree by `patTree.reborn(json)`, 
+add some more documents by `patTree.addDocument(doc)`, 
+then before you store the result json of `var json = tree.toJSON()` back to the database, you **MUST** drop
+three existing collections in the database, then store the result `json` to database again.
+
 
 # Additional functions
 
