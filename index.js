@@ -388,9 +388,7 @@ PATtree.prototype = {
 			if(node && node.type == external) {
 				var sistringLen = node.sistring.length;;
 				if(sistringLen < length) {
-					for(var i = sistringLen; i < length; i++) {
-						node.sistring += "0";
-					}
+					node.sistring += Array(length - sistringLen + 1).join("0");
 				}
 			}
 		});
