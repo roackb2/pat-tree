@@ -38,8 +38,13 @@ var tree = new PATtree();
 ### Add document
 
 ```javascript
-tree.addDocument(input);
+tree.addDocument(doc);
 ```
+
+> **NOTICE**
+> When the document to be added contains sentense that is longer than all
+> the sentenses that has been added to the tree, it may require
+> longer time to complete the operation.
 
 ### Extract Significant Lexical Patterns
 
@@ -70,10 +75,10 @@ var result = tree.segmentDoc(doc, SLPs);
 ```javascript
 var json = tree.toJSON(); 
 ```
-The result json has following three keys:
-	`header`: JSON object,
-	`documents`: array,
-	`tree`: array
+The result json has following three content:
+* `json.header`: JSON object,
+* `json.documents`: array,
+* `json.tree`: array
 
 You could store them to database and use `tree.reborn()` to generate the tree again.
 In NoSQL database, you can store the three items to seperate collections,
@@ -105,7 +110,7 @@ For Example, if using MongoDB native driver:
 ```javascript
 tree.reborn(json);
 ```
-If you use `tree.toJSON()` to generate JSON object and store the three items to different collections, 
+If you use `tree.toJSON()` to generate the JSON object and store the three objects to different collections, 
 you can construct them to the original JSON object and use `tree.reborn(json)` to reborn the tree.
 
 For example, if using MongoDB native driver:
@@ -114,7 +119,7 @@ For example, if using MongoDB native driver:
 		db.collection("documents").find().toArray(function(err, documents) {
 			db.collection("tree").find().toArray(function(err, tree) {
 				var json = {};
-				json.header = headers[0];
+				json.header = headers[0];  // there should be only one header.
 				json.documents = documents;
 				json.tree = tree;
 
@@ -130,14 +135,13 @@ you can add one more document with `patTree.addDocument(doc)` and extract SLPs,
 and then store the tree back to database. Notice that, if you need the SLPs, 
 you should store them to database manually.
 
-**CATUION**
-
-These three collectinos `header`, `documents`, `tree` 
-represent the status of the tree, if you want to reborn from these collections,
-All of them are required for reborn to success. Also, if you rebron a tree by `patTree.reborn(json)`, 
-add some more documents by `patTree.addDocument(doc)`, 
-then before you store the result json of `var json = tree.toJSON()` back to the database, you **MUST** drop
-three existing collections in the database, then store the result `json` to database again.
+> **CATUION**
+> These three object `header`, `documents`, `tree` 
+> represent the status of the tree, if you want to reborn by these three objects,
+> All of them are required for reborn to success. Also, if you rebron a tree by `patTree.reborn(json)`, 
+> add some more documents by `patTree.addDocument(doc)`, 
+> then before you store the JSON object of `var json = tree.toJSON()` back to the database, you **MUST drop**
+> three existing collections in the database, then store the result `json` to database again.
 
 
 # Additional functions
