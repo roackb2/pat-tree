@@ -41,11 +41,6 @@ var tree = new PATtree();
 tree.addDocument(doc);
 ```
 
-> **NOTICE**
-> When the document to be added contains sentense that is longer than all
-> the sentenses that has been added to the tree, it may require
-> longer time to complete the operation.
-
 ### Extract Significant Lexical Patterns
 
 ```javascript
