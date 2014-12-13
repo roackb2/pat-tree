@@ -252,6 +252,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 # Release History
 
+* 0.2.7 Fix bug in `reborn()`
 * 0.2.6 Greatly improve performance of `extractSLP()`
 * 0.2.5 Greatly improve performance of `addDocument()`
 * 0.2.4 Fix bug in `reborn()`

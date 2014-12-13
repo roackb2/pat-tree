@@ -49,6 +49,7 @@ PATtree.prototype = {
 	reborn: function(json) {
 		this.maxSistringLength = json.header.maxSistringLength;
 		this.index = json.header.index;
+		this.documents = [];
 		json.documents.sort(function(item1, item2) {
 			return item1.id - item2.id;
 		})
