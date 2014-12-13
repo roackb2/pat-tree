@@ -172,38 +172,39 @@ PATtree.prototype = {
 			}
 
 			var map = lexicalPatters[i];
-			if(map.candidate) {
-				var sistring = map.sistring;
-			
-				var fstOverlapString = sistring.slice(0, sistring.length - 1);
-				var sndOverlapString = sistring.slice(1, sistring.length);
+			var sistring = map.sistring;
+		
+			var fstOverlapString = sistring.slice(0, sistring.length - 1);
+			var sndOverlapString = sistring.slice(1, sistring.length);
 
-				var fstOverlap = lexicalPatters[sistrings.indexOf(fstOverlapString)];
-				var sndOverlap = lexicalPatters[sistrings.indexOf(sndOverlapString)];
+			var fstOverlap = lexicalPatters[sistrings.indexOf(fstOverlapString)];
+			var sndOverlap = lexicalPatters[sistrings.indexOf(sndOverlapString)];
 
 
-				if(fstOverlap && sndOverlap) {
-					map.se = map.frequency / (fstOverlap.frequency + sndOverlap.frequency - map.frequency);							
-				} else if(fstOverlap) {
-					map.se = map.frequency / (fstOverlap.frequency - map.frequency);				
-				} else if(sndOverlap) {
-					map.se = map.frequency / (sndOverlap.frequency - map.frequency);
-				}
+			if(fstOverlap && sndOverlap) {
+				map.se = map.frequency / (fstOverlap.frequency + sndOverlap.frequency - map.frequency);							
+			} else if(fstOverlap) {
+				map.se = map.frequency / (fstOverlap.frequency - map.frequency);				
+			} else if(sndOverlap) {
+				map.se = map.frequency / (sndOverlap.frequency - map.frequency);
+			}
 
-				if(map.se > SETreshold) {
-					if(fstOverlap) {
-						fstOverlap.candidate = false;					
-					} 
-					if(sndOverlap) {
-						sndOverlap.candidate = false;
-					}
-				}
-
-				result.push(map.sistring);
-				if(verbose && result.length % 1000 == 0) {
-					console.log("done processing No." + result.length + " item");
+			if(map.se > SETreshold) {
+				if(fstOverlap) {
+					fstOverlap.candidate = false;					
+				} 
+				if(sndOverlap) {
+					sndOverlap.candidate = false;
 				}
 			}
+			
+			if(map.candidate) {
+				result.push(map.sistring);
+			}
+			if(verbose && result.length % 1000 == 0) {
+				console.log("done processing No." + result.length + " item");
+			}			
+
 		} 
 		if(verbose) {
 			console.log("extracting SLP completes, total " + result.length + " SLPs")
