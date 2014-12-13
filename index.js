@@ -201,11 +201,7 @@ PATtree.prototype = {
 				}
 			}
 			
-			if(map.candidate) {
-				result.push(map);
-				if(verbose && result.length % 1000 == 0) {
-					console.log("done processing No." + result.length + " item");
-				}						
+			if(map.candidate) {					
 				result.push(map.sistring);
 				if(verbose && result.length % 1000 == 0) {
 					console.log("done processing No." + result.length + " item");
