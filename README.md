@@ -44,12 +44,14 @@ tree.addDocument(doc);
 ### Extract Significant Lexical Patterns
 
 ```javascript
-var SLPs = tree.extractSLP(TFThreshold, SEThreshold); 
+var SLPs = tree.extractSLP(TFThreshold, SEThreshold, verbose); 
 // SLPs: array of strings, which are signifiant lexical patterns.
 ```
 
 If the frequency of a pattern exceeds `TFThreshold`, 
 and the SE value exceeds `SEThreshold`, it would appear in the result array.
+
+`verbose`: optional, if set to true, then will print out progress on console.
 
 `TFTreshold` should be integer, `SEThreshold` should be float between 0 and 1.
 
@@ -250,6 +252,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 # Release History
 
+* 0.2.6 Greatly improve performance of `extractSLP()`
 * 0.2.5 Greatly improve performance of `addDocument()`
 * 0.2.4 Fix bug in `reborn()`
 * 0.2.3 Add functions `toJSON()` and `reborn()`

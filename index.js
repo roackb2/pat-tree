@@ -126,72 +126,88 @@ PATtree.prototype = {
 		return result;
 	},
 
-	extractSLP: function(TFTrheshold, SETreshold) {
+	extractSLP: function(TFTrheshold, SETreshold, verbose) {
 		var owner = this;
 		var totalFrequency = this.tree.root.totalFrequency;
 		var lexicalPatters = [];
 		var result = [];
+		var sistrings = [];
+		if(verbose) {
+			console.log("collecting internal nodes");
+		}
 		this.preOrderTraverse(function(node) {
-			if(node.type == owner.INTERNAL) {
-				var sistring = owner._restorePrefix(node);
-				if(sistring != "" && node.totalFrequency > TFTrheshold) {
+			if(node.type == owner.INTERNAL && node.totalFrequency > TFTrheshold) {
+				var sistring = owner._restorePrefix(node);					
+				if(sistring != "" && sistrings.indexOf(sistring) == -1) {
 					var map = {};
 					map.sistring = sistring;
 					map.frequency = node.totalFrequency / totalFrequency;
 					map.candidate = true;
 					map.se = -1;
 					lexicalPatters.push(map);
+					sistrings.push(sistring);
+					if(verbose && lexicalPatters.length % 1000 == 0) {
+						console.log("done collecting No." + lexicalPatters.length + " node");
+					}					
 				}
 			}
-		})
+		});
+
+		if(verbose) {
+			console.log("collection completed, number of nodes: " + lexicalPatters.length + ", sorting nodes");			
+		}
 		lexicalPatters.sort(function(item1, item2) {
 			return item2.sistring.length - item1.sistring.length;
 		});
+		sistrings.sort(function(item1, item2) {
+			return item2.length - item1.length;
+		});
 
+		if(verbose) {
+			console.log("start marking candidates")
+		}
 		for(var i = 0; i < lexicalPatters.length; i++) {
-			var sistring = lexicalPatters[i].sistring;
-			var fstOverlapIndex = -1;
-			var sndOverlapIndex = -1;
-			var fstOverlapString = sistring.slice(0, sistring.length - 1);
-			var sndOverlapString = sistring.slice(1, sistring.length);
-
-			for(var j = i; j < lexicalPatters.length; j++) {
-				if(lexicalPatters[j].sistring == fstOverlapString) {
-					fstOverlapIndex = j;
-				}
-				if(lexicalPatters[j].sistring == sndOverlapString) {
-					sndOverlapIndex = j;
-				}
+			if(lexicalPatters[i].sistring != sistrings[i]) {
+				throw "internal error, sistrings not aligned.";
 			}
 
 			var map = lexicalPatters[i];
-			var fstOverlap;
-			var sndOverlap;
-			if(fstOverlapIndex != -1 && sndOverlapIndex != -1) {
-				fstOverlap = lexicalPatters[fstOverlapIndex];				
-				sndOverlap = lexicalPatters[sndOverlapIndex];	
-				map.se = map.frequency / (fstOverlap.frequency + sndOverlap.frequency - map.frequency);							
-			} else if(fstOverlapIndex != -1) {
-				fstOverlap = lexicalPatters[fstOverlapIndex];				
-				map.se = map.frequency / (fstOverlap.frequency - map.frequency);				
-			} else if(sndOverlapIndex != -1) {
-				sndOverlap = lexicalPatters[sndOverlapIndex];	
-				map.se = map.frequency / (sndOverlap.frequency - map.frequency);
-			}
+			if(map.candidate) {
+				var sistring = map.sistring;
+			
+				var fstOverlapString = sistring.slice(0, sistring.length - 1);
+				var sndOverlapString = sistring.slice(1, sistring.length);
 
-			if(map.se > SETreshold) {
-				if(fstOverlapIndex != -1) {
-					fstOverlap.candidate = false;					
-				} 
-				if(sndOverlapIndex != -1) {
-					sndOverlap.candidate = false;
+				var fstOverlap = lexicalPatters[sistrings.indexOf(fstOverlapString)];
+				var sndOverlap = lexicalPatters[sistrings.indexOf(sndOverlapString)];
+
+
+				if(fstOverlap && sndOverlap) {
+					map.se = map.frequency / (fstOverlap.frequency + sndOverlap.frequency - map.frequency);							
+				} else if(fstOverlap) {
+					map.se = map.frequency / (fstOverlap.frequency - map.frequency);				
+				} else if(sndOverlap) {
+					map.se = map.frequency / (sndOverlap.frequency - map.frequency);
+				}
+
+				if(map.se > SETreshold) {
+					if(fstOverlap) {
+						fstOverlap.candidate = false;					
+					} 
+					if(sndOverlap) {
+						sndOverlap.candidate = false;
+					}
+				}
+
+				result.push(map.sistring);
+				if(verbose && result.length % 1000 == 0) {
+					console.log("done processing No." + result.length + " item");
 				}
 			}
-
-			if(map.candidate && result.indexOf(map.sistring) == -1) {
-				result.push(map.sistring);
-			}
 		} 
+		if(verbose) {
+			console.log("extracting SLP completes, total " + result.length + " SLPs")
+		}
 		return result;
 	},
 
