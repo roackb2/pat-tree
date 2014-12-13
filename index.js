@@ -108,51 +108,24 @@ PATtree.prototype = {
 	},
 
 	segmentDoc: function(doc, SLPs) {
-		SLPs.sort(function(item1, item2) {
-			return item1.frequency - item2.frequency;
-		})
-		var result = "";
-		var paper = [];
+		var result = "";	
 		for(var i = 0; i < doc.length; i++) {
-			var word = {
-				char: doc.charAt(i),
-				marked: false,
-				keyword: null
-			}
-			paper.push(word);
-		}			
-		for(var i = 0; i < SLPs.length; i++) {
-			var sistring = SLPs[i].sistring;
-			if(doc.indexOf(sistring) != -1) {
-				for(var j = 0; j < doc.length; j++) {
-					if(doc.substring(j, j + sistring.length) == sistring) {	
-						var valid = true;
-						for(var k = j; k < j + sistring.length; k++) {
-							if(paper[k].marked) {
-								valid = false;
-							}
-						}
-						if(valid) {
-							paper[j].keyword = sistring;
-							for(var k = j; k < j + sistring.length; k++) {
-								paper[k].marked = true;
-							}
-						}
-					}
+			var subContent = doc.slice(i, doc.length);
+			var index = -1;
+			var keyword = doc.charAt(i);
+			for(var j = 0; j < SLPs.length; j++) {
+				index = subContent.indexOf(SLPs[j]);
+				if(index == 0) {
+					keyword = SLPs[j];
+					i += keyword.length - 1;
+					break;
 				}
 			}
-		}
-		for(var i = 0; i < doc.length; i++) {
-			if(paper[i].marked) {
-				result += " " + paper[i].keyword;
-				i += paper[i].keyword.length - 1;
-			} else {
-				result += " " + paper[i].char;
-			}
+			result += " " + keyword;
 		}
 		return result;
 	},
- 
+
 	extractSLP: function(TFTrheshold, SETreshold, verbose) {
 		var owner = this;
 		var totalFrequency = this.tree.root.totalFrequency;
