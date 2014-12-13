@@ -63,7 +63,7 @@ var result = tree.segmentDoc(doc, SLPs);
 
 `doc` is the document to be segmented, data type: string.
 
-`SLPs` is array of SLP that extracted by `tree.extractSLP()`, or array of keywords retrieved any other way, data type: array of strings.
+`SLPs` is array of SLP that extracted by `tree.extractSLP()`, data type: array of JSON object.
 
 `result` is the result of document segmentation, data type: string.
 
