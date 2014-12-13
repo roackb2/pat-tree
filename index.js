@@ -108,6 +108,9 @@ PATtree.prototype = {
 	},
 
 	segmentDoc: function(doc, SLPs) {
+		SLPs.sort(function(item1, item2) {
+			return item2.length - item1.length
+		})
 		var result = "";	
 		for(var i = 0; i < doc.length; i++) {
 			var subContent = doc.slice(i, doc.length);
@@ -208,8 +211,6 @@ PATtree.prototype = {
 					console.log("done processing No." + result.length + " item");
 				}					
 			}
-		
-
 		} 
 		if(verbose) {
 			console.log("extracting SLP completes, total " + result.length + " SLPs")
