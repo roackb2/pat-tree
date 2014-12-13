@@ -1,22 +1,16 @@
 pat-tree
 ========
 
-PAT tree construction for Chinese document, now in development.
-Provide functionality to add documents and construct PAT tree in memory, store it to database,
-extract keywords, and split documents.
+PAT tree construction for Chinese document.
+Provide functionality to add documents and construct PAT tree in memory, 
+convert to JSON for storing to database,
+extract keywords, and text segmentation.
 
 example of result:
 
 	有時 喜歡   有時候 不喜歡
 	為什麼 會 這樣   … ？
 	20 點 求 解 哈哈
-
-
-# WARNING
-
-This project is now in development and used for academic purpose,
-**DO NOT** use this module in production until the **WARNING** statement is removed.
-//TODO: improve document splitting algorithm
 
 
 # Installation
@@ -28,7 +22,7 @@ npm install pat-tree --save
 # Usage
  
 
-### Instanitiate
+### Instantiate
 
 ```javascript
 var PATtree = require("pat-tree");
@@ -45,11 +39,11 @@ tree.addDocument(doc);
 
 ```javascript
 var SLPs = tree.extractSLP(TFThreshold, SEThreshold, verbose); 
-// SLPs: array of strings, which are signifiant lexical patterns.
+// SLPs: array of JSON objects, which are signifiant lexical patterns and their relative informations.
 ```
 
-If the frequency of a pattern exceeds `TFThreshold`, 
-and the SE value exceeds `SEThreshold`, it would appear in the result array.
+If the frequency of a pattern exceeds `TFThreshold`, it would appear in the result array.
+The higher the `SEThreshold`, the stricter to filter out longest substrings of a significant lexical pattern.
 
 `verbose`: optional, if set to true, then will print out progress on console.
 
@@ -252,6 +246,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 # Release History
 
+* 0.2.9 Modify README file
 * 0.2.8 Improve algorithm of `segmentDoc()`
 * 0.2.7 Fix bug in `reborn()`
 * 0.2.6 Greatly improve performance of `extractSLP()`
