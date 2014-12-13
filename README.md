@@ -246,7 +246,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 
 # Release History
 
-* 0.2.9 Modify README file
+* 1.0.0 Stable release
 * 0.2.8 Improve algorithm of `segmentDoc()`
 * 0.2.7 Fix bug in `reborn()`
 * 0.2.6 Greatly improve performance of `extractSLP()`
