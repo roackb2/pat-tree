@@ -108,20 +108,47 @@ PATtree.prototype = {
 	},
 
 	segmentDoc: function(doc, SLPs) {
-		var result = "";					;	
+		SLPs.sort(function(item1, item2) {
+			return item1.frequency - item2.frequency;
+		})
+		var result = "";
+		var paper = [];
 		for(var i = 0; i < doc.length; i++) {
-			var subContent = doc.slice(i, doc.length);
-			var index = -1;
-			var keyword = doc.charAt(i);
-			for(var j = 0; j < SLPs.length; j++) {
-				index = subContent.indexOf(SLPs[j]);
-				if(index == 0) {
-					keyword = SLPs[j];
-					i += keyword.length - 1;
-					break;
+			var word = {
+				char: doc.charAt(i),
+				marked: false,
+				keyword: null
+			}
+			paper.push(word);
+		}			
+		for(var i = 0; i < SLPs.length; i++) {
+			var sistring = SLPs[i].sistring;
+			if(doc.indexOf(sistring) != -1) {
+				for(var j = 0; j < doc.length; j++) {
+					if(doc.substring(j, j + sistring.length) == sistring) {	
+						var valid = true;
+						for(var k = j; k < j + sistring.length; k++) {
+							if(paper[k].marked) {
+								valid = false;
+							}
+						}
+						if(valid) {
+							paper[j].keyword = sistring;
+							for(var k = j; k < j + sistring.length; k++) {
+								paper[k].marked = true;
+							}
+						}
+					}
 				}
 			}
-			result += " " + keyword;
+		}
+		for(var i = 0; i < doc.length; i++) {
+			if(paper[i].marked) {
+				result += " " + paper[i].keyword;
+				i += paper[i].keyword.length - 1;
+			} else {
+				result += " " + paper[i].char;
+			}
 		}
 		return result;
 	},
@@ -199,7 +226,7 @@ PATtree.prototype = {
 			}
 
 			if(map.candidate) {
-				result.push(map.sistring);
+				result.push(map);
 				if(verbose && result.length % 1000 == 0) {
 					console.log("done processing No." + result.length + " item");
 				}						
