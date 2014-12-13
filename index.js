@@ -110,7 +110,7 @@ PATtree.prototype = {
 
 	segmentDoc: function(doc, SLPs) {
 		SLPs.sort(function(item1, item2) {
-			return item1.frequency - item2.frequency;
+			return item2.sistring.length - item2.sistring.length;
 		})
 		var result = "";
 		var paper = [];
