@@ -26,7 +26,7 @@ npm install pat-tree --save
 ```
 
 # Usage
-
+ 
 
 ### Instanitiate
 

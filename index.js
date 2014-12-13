@@ -125,7 +125,7 @@ PATtree.prototype = {
 		}
 		return result;
 	},
-
+ 
 	extractSLP: function(TFTrheshold, SETreshold, verbose) {
 		var owner = this;
 		var totalFrequency = this.tree.root.totalFrequency;
