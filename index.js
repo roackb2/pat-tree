@@ -1,5 +1,6 @@
 var Tree = require("./lib/BTree");
 var Node = require("./lib/Node.js");
+var utils = require("./lib/utils.js");
 
 module.exports = PATtree;
 
@@ -241,7 +242,7 @@ PATtree.prototype = {
 	},
 
 	addDocument: function(doc) {
-		var sentenses = this._splitDocument(doc);
+		var sentenses = utils.splitDocument(doc);
 		var preIndex = this.documents.length.toString();
 		for(var i = 0; i < sentenses.length; i++) {
 			var index = preIndex + "." + i.toString();
@@ -254,7 +255,7 @@ PATtree.prototype = {
 		var preIndex = sentenseIndex + ".";
 		for(var i = 0; i < sentense.length; i++) {
 			var charSistring = sentense.slice(i, sentense.length);
-			var sistring = this._toBinary(charSistring);
+			var sistring = utils.toBinary(charSistring);
 			var index = preIndex + i.toString();
 			this._addSistring(sistring, index);
 		}
@@ -338,7 +339,7 @@ PATtree.prototype = {
 		} else if(node.type == this.EXTERNAL) {
 			nodeString = node.sistring;
 		}
-		var branchBit = this._findBranchPosition(nodeString, sistring);
+		var branchBit = utils.findBranchPosition(nodeString, sistring);
 		var parent = node.parent;
 		var subtree = this._createSubTree();
 
@@ -437,35 +438,7 @@ PATtree.prototype = {
 		});
 	},
 
-	_checkPrefix: function(sis1, sis2, x) {
-		var result = true;;
-		for(var i = 0; i < x; i++) {
-			if(sis1[i] != sis2[i]) {
-				result = false;
-				break;
-			}
-		}
-		return result;
-	},
 
-	_findBranchPosition: function(sis1, sis2) {
-		var maxLen = Math.min(sis1.length, sis2.length);
-		var i;
-		for(i = 0; i < maxLen; i++) {
-			if(sis1[i] != sis2[i]) {
-				break;
-			}
-		}
-		return i;
-	},
-
-	_toBinary: function(s) {
-		var output = "";
-		for(var i = 0; i < s.length; i++) {
-			output += s[i].charCodeAt(0).toString(2);
-		}
-		return output;
-	},
 
 	_restoreSistring: function(externalNode) {
 		var sistring = externalNode.sistring;
@@ -481,7 +454,7 @@ PATtree.prototype = {
 			var arr = [];
 			var word = sentense[i];
 			arr.push(sentense[i]);
-			comparison += this._toBinary(arr);
+			comparison += utils.toBinary(arr);
 			output += word;
 		}
 
@@ -505,7 +478,7 @@ PATtree.prototype = {
 			var word = sentense[i];
 			arr.push(sentense[i]);
 
-			var binaryWord = this._toBinary(arr);
+			var binaryWord = utils.toBinary(arr);
 			if(comparison.length + binaryWord.length >= prefix.length) {
 				break;
 			} else {
@@ -516,94 +489,6 @@ PATtree.prototype = {
 		return output;
 	},
 
-	_toString: function(b) {
-		var output = "";
-		var temp = 0;
-		var charCount = b.length / 15;
-		for(var i = 0; i < charCount; i++) {
-			var binary = b.slice(i * 15, (i + 1) * 15);
-			var number = parseInt(binary, 2);
-			output += String.fromCharCode(number);
-		}
-		return output;
-	},
-
-	_splitDocument: function(doc) {
-		var regex = /[，。,.\s]+/;
-		var sentenses = doc.split(regex);
-		return sentenses;
-	},
-
-	_getMean: function(arr, key) {
-		var total = 0;
-		for(var i = 0; i < arr.length; i++) {
-			total += arr[i][key];
-		}
-		return total / arr.length;
-	},
-
-	_getStdev: function(arr, key) {
-		var mean = this._getMean(arr, key);
-		var variance = 0;
-		for(var i = 0; i < arr.length; i++) {
-			variance += Math.pow((arr[i][key] - mean), 2);
-		}
-		return Math.sqrt(variance / arr.length);
-	},
-
-	_getNormalized: function(arr, key) {
-		var mean = this._getMean(arr, key);
-		var stdev = this._getStdev(arr, key);
-
-		var result = [];
-
-		for(var i = 0; i < arr.length; i++) {
-			result[i] = {};
-			for(var other in arr[i]) {
-				result[i][other] = arr[i][other];
-			}
-			var point = arr[i][key] - mean;
-			if(point != 0) {
-				point /= stdev;				
-			}
-			result[i][key] = point;
-		}
-		return result;
-	},
-
-	_classify: function(SLPs) {
-		var buckets = [];
-		for(var i = 0; i < SLPs.length; i++) {
-			var SLP = SLPs[i];
-			var len = SLP.sistring.length;
-			if(!buckets[len]) {
-				buckets[len] = [];
-			}
-			buckets[len].push(SLP);			
-		}
-		var results = [];
-		for(var i = 0; i < buckets.length; i++) {
-			if(buckets[i]) {
-				results[i] = this._getNormalized(buckets[i], "frequency");
-			}
-		}
-		return results;
-	},
-
-	_getMergedAndSorted: function(SLPs) {
-		var buckets = this._classify(SLPs);
-		var result = [];
-		for(var i = 0; i < buckets.length; i++) {
-			if(buckets[i]) {
-				result = result.concat(buckets[i]);
-			}
-		}
-		result.sort(function(item1, item2) {
-			return Math.abs(item2.frequency) - Math.abs(item1.frequency);
-		})
-		//console.log(result);
-		return result;
-	},
 
 	printTreeContent: function(printExternalNodes, printDocuments) {
 		var tree = this.tree;
