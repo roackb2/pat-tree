@@ -109,9 +109,7 @@ PATtree.prototype = {
 	},
 
 	segmentDoc: function(doc, SLPs) {
-		SLPs.sort(function(item1, item2) {
-			return item2.sistring.length - item2.sistring.length;
-		})
+		SLPs = this._getMergedAndSorted(SLPs);
 		var result = "";
 		var paper = [];
 		for(var i = 0; i < doc.length; i++) {
@@ -532,6 +530,77 @@ PATtree.prototype = {
 		var regex = /[，。,.\s]+/;
 		var sentenses = doc.split(regex);
 		return sentenses;
+	},
+
+	_getMean: function(arr, key) {
+		var total = 0;
+		for(var i = 0; i < arr.length; i++) {
+			total += arr[i][key];
+		}
+		return total / arr.length;
+	},
+
+	_getStdev: function(arr, key) {
+		var mean = this._getMean(arr, key);
+		var variance = 0;
+		for(var i = 0; i < arr.length; i++) {
+			variance += Math.pow((arr[i][key] - mean), 2);
+		}
+		return Math.sqrt(variance / arr.length);
+	},
+
+	_getNormalized: function(arr, key) {
+		var mean = this._getMean(arr, key);
+		var stdev = this._getStdev(arr, key);
+
+		var result = [];
+
+		for(var i = 0; i < arr.length; i++) {
+			result[i] = {};
+			for(var other in arr[i]) {
+				result[i][other] = arr[i][other];
+			}
+			var point = arr[i][key] - mean;
+			if(point != 0) {
+				point /= stdev;				
+			}
+			result[i][key] = point;
+		}
+		return result;
+	},
+
+	_classify: function(SLPs) {
+		var buckets = [];
+		for(var i = 0; i < SLPs.length; i++) {
+			var SLP = SLPs[i];
+			var len = SLP.sistring.length;
+			if(!buckets[len]) {
+				buckets[len] = [];
+			}
+			buckets[len].push(SLP);			
+		}
+		var results = [];
+		for(var i = 0; i < buckets.length; i++) {
+			if(buckets[i]) {
+				results[i] = this._getNormalized(buckets[i], "frequency");
+			}
+		}
+		return results;
+	},
+
+	_getMergedAndSorted: function(SLPs) {
+		var buckets = this._classify(SLPs);
+		var result = [];
+		for(var i = 0; i < buckets.length; i++) {
+			if(buckets[i]) {
+				result = result.concat(buckets[i]);
+			}
+		}
+		result.sort(function(item1, item2) {
+			return Math.abs(item2.frequency) - Math.abs(item1.frequency);
+		})
+		//console.log(result);
+		return result;
 	},
 
 	printTreeContent: function(printExternalNodes, printDocuments) {
