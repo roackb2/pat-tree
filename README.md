@@ -273,6 +273,8 @@ by specifying V8 option `--max_old_space_size=8000`, has following performance.
 
 # Release History
 
+
+* 1.0.2 Gaurantee SLP sorting order when `segmentDoc()`
 * 1.0.1 Modify README file
 * 1.0.0 Stable release
 * 0.2.8 Improve algorithm of `segmentDoc()`
