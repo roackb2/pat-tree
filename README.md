@@ -35,6 +35,8 @@ var tree = new PATtree();
 tree.addDocument(doc);
 ```
 
+`doc` is the document you want to add to the tree. data type: string
+
 ### Extract Significant Lexical Patterns
 
 ```javascript
@@ -137,11 +139,11 @@ and you can do all operations like `patTree.addDocuments(doc)` to it.
 ### Print tree content
 
 ```javascript
-tree.printTreeContent(printExternalNodes, printDocuments);
+tree.printTreeContent(printExternalNode, printDocuments);
 ```
 
 Print the content of the tree on console.
-If `printExternalNodes` is set to true, print out all external nodes for each internal node.
+If `printExternalNode` is set to true, print out one external node for each internal node.
 If `printDocuments` is set to true, print out the whole collection of the tree.
 
 ### Traversal
@@ -175,7 +177,7 @@ Every nodes has some common informaitons, an node has the following structure:
 ```javascript
 	node = {
 		id: 3,        // the id of this node, data type: integer, auto generated.
-		parent: 1,    // the parent id of this node, data type: integer
+		parent: parentNode,       // the parent of this node, data type: Node
 		left: leftChildNode,      // data type: Node 
 		right: rightChildNode,    // data type: Node
 	}
@@ -244,8 +246,23 @@ An index is in following structure:
 
 For example, `"0.1.2"` is the index of the character `"測"`.
 
+# Performance
+
+All operations are fast, but require more memory and disk space to operate successfully.
+Running on Macbook Pro Retina, connected to local MongoDB, given 8GB memory size 
+by specifying V8 option `--max_old_space_size=8000`, has following performance.
+
+* Add 32,769 Facebook-like posts by `tree.addDocument()` takes about 5 minutes.
+* After above operation, extract SLP by `tree.extractSLP()` takes about 5 minutes.
+* After above operation, converting to JSON by `tree.toJSON()` and store three collections to database takes about 1 minutes
+  and 5 GB disk space, and about 1,000,000 records of tree nodes.
+* After above operation, find all collections in database and reborn the tree by `tree.reborn()` takes about 1 minutes.
+* After above operation, do text segmentation on 32,769 posts by `tree.segmentDoc()`, given SLPs extracted above, 
+  takes about 5 minutes.
+
 # Release History
 
+* 1.0.1 Modify README file
 * 1.0.0 Stable release
 * 0.2.8 Improve algorithm of `segmentDoc()`
 * 0.2.7 Fix bug in `reborn()`
