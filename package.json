@@ -13,9 +13,14 @@
   "keywords": [
     "node",
     "pat-tree",
+    "trie",
+    "patricia tree",
     "pat tree",
     "PAT",
     "tree",
+    "information retrieval",
+    "Chinese",
+    "ckip",    
     "keyword extraction",
     "text segmentation"
   ],

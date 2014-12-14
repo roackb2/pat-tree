@@ -1,10 +1,21 @@
 pat-tree
 ========
 
-PAT tree construction for Chinese document.
+In Information Retrieval, text segmentation on Chinese like
+documents has been a difficult task, since Chinese words are
+continuous and has no white space between them. But finding basic
+elements of a document is critical for all applications in information retrieval.
+
+PAT tree is a Patricia tree, or called trie, that used particularly for
+text segmentation and word retrieval. This module can be used for
+PAT tree construction for Chinese documents.
 Provide functionality to add documents and construct PAT tree in memory, 
 convert to JSON for storing to database,
 extract keywords, and text segmentation.
+
+You can collect a corpus, adding all of them to construct a PAT tree,
+then extract significant lexical patterns, and do text segmentation
+on other documents.
 
 example of result:
 
