@@ -109,11 +109,17 @@ PATtree.prototype = {
 		this.tree.postOrderTraverse(callback);
 	},
 
-	segmentDoc: function(doc, SLPs) {
+	segmentDoc: function(doc, asArray) {
+		var SLPs = this.SLPs;
 		SLPs.sort(function(item1, item2) {
 			return item2.sistring.length - item1.sistring.length;
 		})
-		var result = "";
+		var result;
+		if(asArray) {
+			result = [];
+		} else {
+			result = "";
+		}
 		var paper = [];
 		for(var i = 0; i < doc.length; i++) {
 			var word = {
@@ -146,10 +152,18 @@ PATtree.prototype = {
 		}
 		for(var i = 0; i < doc.length; i++) {
 			if(paper[i].marked) {
-				result += " " + paper[i].keyword;
+				if(asArray && paper[i]) {
+					result.push(paper[i].keyword);
+				} else {
+					result += " " + paper[i].keyword;					
+				}
 				i += paper[i].keyword.length - 1;
-			} else {
-				result += " " + paper[i].char;
+			} else if(!/\s/.test(paper[i].char)){
+				if(asArray) {
+					result.push(paper[i].char);
+				} else {
+					result += " " + paper[i].char;					
+				}
 			}
 		}
 		return result;
@@ -238,6 +252,7 @@ PATtree.prototype = {
 		if(verbose) {
 			console.log("extracting SLP completes, total " + result.length + " SLPs")
 		}
+		this.SLPs = result;
 		return result;
 	},
 
@@ -557,5 +572,6 @@ PATtree.prototype = {
 	},
 
 }
+
 
 

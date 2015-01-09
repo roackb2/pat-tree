@@ -65,14 +65,24 @@ The higher the `SEThreshold`, the stricter to filter out longest substrings of a
 ### Text segmentation
 
 ```javascript
-var result = tree.segmentDoc(doc, SLPs); 
+var PATtree = require("pat-tree");
+var tree = new PATtree();
+
+//...
+
+tree.extractSLP(10, 0.5); 
+var result = tree.segmentDoc(doc, asArray); 
 ```
+
+you shold do `extractSLP` before doing text segmentation with `segmentDoc`.
 
 `doc` is the document to be segmented, data type: string.
 
 `SLPs` is array of SLP that extracted by `tree.extractSLP()`, data type: array of JSON object.
 
-`result` is the result of document segmentation, data type: string.
+`result` is the result of document segmentation as an string of terms seperated by whitespaces, 
+or an array of terms if `asArray` is set to true.
+
 
 ### Convert to JSON
 
@@ -273,7 +283,7 @@ by specifying V8 option `--max_old_space_size=8000`, has following performance.
 
 # Release History
 
-
+* 1.0.4 `segmentDoc` no need to pass in SLPs, and enable to return array of terms.
 * 1.0.3 Minor change in module Node.js
 * 1.0.2 Gaurantee SLP sorting order when `segmentDoc()`
 * 1.0.1 Modify README file
