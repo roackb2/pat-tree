@@ -283,6 +283,7 @@ by specifying V8 option `--max_old_space_size=8000`, has following performance.
 
 # Release History
 
+* 1.0.5 Restructure folders
 * 1.0.4 `segmentDoc` no need to pass in SLPs, and enable to return array of terms.
 * 1.0.3 Minor change in module Node.js
 * 1.0.2 Gaurantee SLP sorting order when `segmentDoc()`
