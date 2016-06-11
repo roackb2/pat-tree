@@ -9,7 +9,7 @@ elements of a document is critical for all applications in information retrieval
 PAT tree is a Patricia tree, or called trie, that used particularly for
 text segmentation and word retrieval. This module can be used for
 PAT tree construction for Chinese documents.
-Provide functionality to add documents and construct PAT tree in memory, 
+Provide functionality to add documents and construct PAT tree in memory,
 convert to JSON for storing to database,
 extract keywords, and text segmentation.
 
@@ -31,7 +31,7 @@ npm install pat-tree --save
 ```
 
 # Usage
- 
+
 
 ### Instantiate
 
@@ -51,7 +51,7 @@ tree.addDocument(doc);
 ### Extract Significant Lexical Patterns
 
 ```javascript
-var SLPs = tree.extractSLP(TFThreshold, SEThreshold, verbose); 
+var SLPs = tree.extractSLP(TFThreshold, SEThreshold, verbose);
 // SLPs: array of JSON objects, which are signifiant lexical patterns and their relative informations.
 ```
 
@@ -70,8 +70,8 @@ var tree = new PATtree();
 
 //...
 
-tree.extractSLP(10, 0.5); 
-var result = tree.segmentDoc(doc, asArray); 
+tree.extractSLP(10, 0.5);
+var result = tree.segmentDoc(doc, asArray);
 ```
 
 you shold do `extractSLP` before doing text segmentation with `segmentDoc`.
@@ -80,14 +80,14 @@ you shold do `extractSLP` before doing text segmentation with `segmentDoc`.
 
 `SLPs` is array of SLP that extracted by `tree.extractSLP()`, data type: array of JSON object.
 
-`result` is the result of document segmentation as an string of terms seperated by whitespaces, 
+`result` is the result of document segmentation as an string of terms seperated by whitespaces,
 or an array of terms if `asArray` is set to true.
 
 
 ### Convert to JSON
 
 ```javascript
-var json = tree.toJSON(); 
+var json = tree.toJSON();
 ```
 The result json has following three content:
 * `json.header`: JSON object,
@@ -110,12 +110,12 @@ For Example, if using MongoDB native driver:
 	// All documents would be stored to database
 	db.collection("documents").insert(json.documents, function(err, result) {
 		if(err) throw err;
-	});	
+	});
 
 	// All nodes of the tree would be stored to database
 	db.collection("tree").insert(json.tree, function(err, result) {
 		if(err) throw err;				
-	});	
+	});
 ```
 
 
@@ -124,7 +124,7 @@ For Example, if using MongoDB native driver:
 ```javascript
 tree.reborn(json);
 ```
-If you use `tree.toJSON()` to generate the JSON object and store the three objects to different collections, 
+If you use `tree.toJSON()` to generate the JSON object and store the three objects to different collections,
 you can construct them to the original JSON object and use `tree.reborn(json)` to reborn the tree.
 
 For example, if using MongoDB native driver:
@@ -141,16 +141,16 @@ For example, if using MongoDB native driver:
 				patTree.reborn(json);
 			})
 		})
-	})	
+	})
 ```
 
-The `patTree` object would now be the same as the previously stored status, 
+The `patTree` object would now be the same as the previously stored status,
 and you can do all operations like `patTree.addDocuments(doc)` to it.
 
 
 > **CATUION**
-> If you reborn the tree by above method, and do some operations like `patTree.addDocument(doc)`, 
-> and you want to store the tree back to database as illustrated in *Convert to JSON*, 
+> If you reborn the tree by above method, and do some operations like `patTree.addDocument(doc)`,
+> and you want to store the tree back to database as illustrated in *Convert to JSON*,
 > you **MUST** drop the collections(header, documents, tree) in the database first,
 > avoiding any record that is previously stored.
 
@@ -199,33 +199,33 @@ Every nodes has some common informaitons, an node has the following structure:
 	node = {
 		id: 3,        // the id of this node, data type: integer, auto generated.
 		parent: parentNode,       // the parent of this node, data type: Node
-		left: leftChildNode,      // data type: Node 
+		left: leftChildNode,      // data type: Node
 		right: rightChildNode,    // data type: Node
 	}
 ```
 
 Other attributes in nodes are different for internal nodes and external nodes,
 Internal nodes has following structure:
-	
+
 ### Internal nodes
 
 ```javascript
 	internalNode = {
-		// ... 
+		// ...
 
-		type: "internal", 
+		type: "internal",
         // indicates this is an internal node
 		position: 13,
         // the branch position of external nodes, data type: integer
-		prefix: "00101", 
+		prefix: "00101",
         // the sharing prefix of external nodes, data type: string of 0s and 1s
-		externalNodeNum: 87, 
-        // number of external nodes contained in subtree of this node, 
+		externalNodeNum: 87,
+        // number of external nodes contained in subtree of this node,
         // data type: integer
-		totalFrequency: 89, 
+		totalFrequency: 89,
         // number of the total frequency of the external nodes in the collection,
         // data type: integer
-		sistringRepres: node 
+		sistringRepres: node
         // one of the external node in the subree of this internal node,
         // data type: Node
 	}
@@ -239,11 +239,11 @@ External nodes has following structure:
 	externalNode = {
 		// ...
 
-		type: "external", 
+		type: "external",
         // indicates this is an external node,
-		sistring: "00101100110101", 
+		sistring: "00101100110101",
         // binary representation of the character, data type: string
-		indexes: ["0.1,3", "1.2.5"] 
+		indexes: ["0.1,3", "1.2.5"]
         // the positions where the sistring appears in the collection,
         // data type: array
 	}
@@ -270,7 +270,7 @@ For example, `"0.1.2"` is the index of the character `"測"`.
 # Performance
 
 All operations are fast, but require more memory and disk space to operate successfully.
-Running on Macbook Pro Retina, connected to local MongoDB, given 8GB memory size 
+Running on Macbook Pro Retina, connected to local MongoDB, given 8GB memory size
 by specifying V8 option `--max_old_space_size=8000`, has following performance.
 
 * Add 32,769 Facebook-like posts by `tree.addDocument()` takes about 5 minutes.
@@ -278,11 +278,12 @@ by specifying V8 option `--max_old_space_size=8000`, has following performance.
 * After above operation, converting to JSON by `tree.toJSON()` and store three collections to database takes about 1 minutes
   and 5 GB disk space, and about 1,000,000 records of tree nodes.
 * After above operation, find all collections in database and reborn the tree by `tree.reborn()` takes about 1 minutes.
-* After above operation, do text segmentation on 32,769 posts by `tree.segmentDoc()`, given SLPs extracted above, 
+* After above operation, do text segmentation on 32,769 posts by `tree.segmentDoc()`, given SLPs extracted above,
   takes about 5 minutes.
 
 # Release History
 
+* 1.0.6 Correct require path
 * 1.0.5 Restructure folders
 * 1.0.4 `segmentDoc` no need to pass in SLPs, and enable to return array of terms.
 * 1.0.3 Minor change in module Node.js
