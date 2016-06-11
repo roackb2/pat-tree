@@ -34,6 +34,6 @@
   },
   "dependencies": {
     "node-uuid": "^1.4.1",
-    "bin-tree": "git+https://git@github.com/roackb2/bin-tree.git"
+    "bin-tree": "roackb2/bin-tree"
   }
 }
