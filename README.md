@@ -283,6 +283,7 @@ by specifying V8 option `--max_old_space_size=8000`, has following performance.
 
 # Release History
 
+* 1.0.8 Update url of modules hosted on github to a simpler form.
 * 1.0.7 Require the bin-tree module instead of including source files in the project.
 * 1.0.6 Correct require path
 * 1.0.5 Restructure folders

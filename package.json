@@ -1,6 +1,6 @@
 {
   "name": "pat-tree",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "PAT tree construction for Chinese documents, keyword extraction and text segmentation",
   "main": "index.js",
   "scripts": {
