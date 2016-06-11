@@ -283,6 +283,7 @@ by specifying V8 option `--max_old_space_size=8000`, has following performance.
 
 # Release History
 
+* 1.0.7 Require the bin-tree module instead of including source files in the project.
 * 1.0.6 Correct require path
 * 1.0.5 Restructure folders
 * 1.0.4 `segmentDoc` no need to pass in SLPs, and enable to return array of terms.

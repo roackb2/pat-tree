@@ -1,6 +1,6 @@
 {
   "name": "pat-tree",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "PAT tree construction for Chinese documents, keyword extraction and text segmentation",
   "main": "index.js",
   "scripts": {
@@ -33,6 +33,7 @@
   "devDependencies": {
   },
   "dependencies": {
-    "node-uuid": "^1.4.1"
+    "node-uuid": "^1.4.1",
+    "bin-tree": "git+https://git@github.com/roackb2/bin-tree.git"
   }
 }
